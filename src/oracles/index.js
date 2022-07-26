@@ -30,6 +30,7 @@ class Oracle extends Component {
 
   render() {
     const keys = Object.keys(this.state)
+    console.log(`keys are ${JSON.stringify(keys, null, 2)}`)
     const subs = keys.map(key => {
       if (this.state[key].length > 0) {
         return <Fields title={this.state[key].title} columns={this.state[key].columns} data={this.state[key].data} />
