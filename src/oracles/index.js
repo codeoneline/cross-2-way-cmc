@@ -31,13 +31,13 @@ class Oracle extends Component {
   render() {
     const keys = Object.keys(this.state)
     console.log(`keys are ${JSON.stringify(keys, null, 2)}`)
-    const subs = keys.map(key => {
-      if (this.state[key].length > 0) {
+    let subs = <div>Loading...</div>
+    if (keys.length > 0) {
+      subs = keys.map(key => {
+        console.log(`${key} states are ${JSON.stringify(this.state[key], null, 2)}`)
         return <Fields title={this.state[key].title} columns={this.state[key].columns} data={this.state[key].data} />
-      } else {
-        return <div>Loading...</div>
-      }
-    })
+      })
+    }
     // let prices = <div>Loading...</div>;
     // let configs = <div>Loading...</div>;
     // let sgs = <div>Loading...</div>;
