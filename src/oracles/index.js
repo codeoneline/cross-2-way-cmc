@@ -57,7 +57,7 @@ class Oracle extends Component {
         {/* { prices }
         { configs }
         { sgs } */
-        ...subs
+        subs
       }
       </div>
     )
