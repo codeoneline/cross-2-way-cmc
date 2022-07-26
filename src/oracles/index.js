@@ -35,7 +35,11 @@ class Oracle extends Component {
     if (keys.length > 0) {
       subs = keys.map(key => {
         console.log(`${key} states are ${JSON.stringify(this.state[key], null, 2)}`)
-        return <Fields title={this.state[key].title} columns={this.state[key].columns} data={this.state[key].data} />
+        if (this.state[key].columns) {
+          return <Fields title={this.state[key].title} columns={this.state[key].columns} data={this.state[key].data} />
+        } else {
+          return <div>Loading...</div>
+        }
       })
     }
     // let prices = <div>Loading...</div>;
