@@ -5,6 +5,7 @@
   vm,视窗宽度，1vw=视窗宽度的1%
   vh,视窗高度，1vh=视窗高度的1%
   rpx, 微信把屏幕等分成750rpx，如果手机分辨率是375px，则1rpx=0.5px
+  fr, 去掉grid gap后,按比例分
 */
 /* xs sm md lg xl ：<768 <992 <1200 <1600 1600+ */
 /* ipad iphone: only max-device-width orientation: portrait landscape*/
@@ -20,10 +21,10 @@
   html { font-size: 12px; }
 }
 @media only screen and (max-width: 1600px) and (min-width: 1201px) {
-  html { font-size: 13px; }
+  html { font-size: 12px; }
 }
 @media only screen and (max-width: 2400px) and (min-width: 1601px) {
-  html { font-size: 14px; }
+  html { font-size: 12px; }
 }
 @media only screen and (min-width: 2401px) {
   html { font-size: 18px; }
@@ -37,7 +38,7 @@ body {
 
 .app {
   display: grid;
-  grid-template-rows: 0.1fr 4fr;
+  grid-template-rows: 30px auto;
   grid-template-areas: "title" "main";
 
   grid-row-gap: 5px;

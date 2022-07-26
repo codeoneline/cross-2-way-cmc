@@ -21,6 +21,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "http-server ./build -p 9999 -c-1",
+    "server_testnet": "http-server ./build -p 9998 -c-1",
     "bm": "autocannon -c 100 -d 5 -p 10 http://192.168.1.179:9999"
   },
   "eslintConfig": {
