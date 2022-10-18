@@ -18,8 +18,8 @@ class App extends Component {
       <>
         <div className='app'>
           <div className='title'>
-            <div>cross chain oracle tokenManager contract states</div>
-            <button onClick={ this.refreshTokenPairs }>tokenPair的数量没变, 但内容变时, 请手动更新!</button>
+            <div>cross chain oracle tokenManager contract states    <button onClick={ this.refreshTokenPairs }>tokenPair的数量没变, 但内容变时, 请点我手动更新!</button></div>
+            
           </div>
         <div className='main'>
           <Chains />
