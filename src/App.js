@@ -3,7 +3,7 @@ import './App.css';
 import Chains from './chains';
 import Oracles from './oracles';
 import TokenManagers from './tokenManagers';
-import chainState from '../utils/chain-state'
+import chainState from './utils/chain-state'
 
 class App extends Component {
 
