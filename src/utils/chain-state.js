@@ -33,6 +33,17 @@ class ChainState {
       return null;
     }
   }
+
+  refreshTokenPairs = async () => {
+    try {
+      console.log("refreshing")
+      const data = (await axios.get(`${url}tms/refresh`)).data;
+      return data;
+    } catch (error) {
+      console.log('refresh TokenPairs error: ' + error);
+      return null;
+    }
+  }
 }
 
 
