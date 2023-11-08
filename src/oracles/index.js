@@ -20,12 +20,12 @@ class Oracle extends Component {
   componentDidMount() {
     console.log("Oracle ComponentDidMount")
     this.getInfo()
-    this.timer = setInterval(this.getInfo, 60000, null)
+    // this.timer = setInterval(this.getInfo, 60000, null)
   }
 
   componentWillUnmount() {
     console.log("Oracle ComponentWillUnmount")
-    clearInterval(this.timer)
+    // clearInterval(this.timer)
   }
 
   render() {
