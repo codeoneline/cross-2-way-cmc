@@ -20,12 +20,12 @@ class Chains extends Component {
   componentDidMount() {
     console.log("Chains ComponentDidMount")
     this.getInfo()
-    this.timer = setInterval(this.getInfo, 60000, null)
+    // this.timer = setInterval(this.getInfo, 600000, null)
   }
 
   componentWillUnmount() {
     console.log("Chains ComponentWillUnmount")
-    clearInterval(this.timer)
+    // clearInterval(this.timer)
   }
 
   render() {
