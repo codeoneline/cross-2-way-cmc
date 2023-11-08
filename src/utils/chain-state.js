@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // const url = 'http://localhost:3200/';
-const url = 'http://34.210.149.238:13200/'
+const url = process.env.NODE_ENV === 'production' ? 'http://localhost:3200/' : 'http://34.210.149.238:13200/'
 
 class ChainState {
   getChainInfo = async () => {
