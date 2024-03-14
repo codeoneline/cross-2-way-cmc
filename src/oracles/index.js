@@ -13,6 +13,29 @@ class Oracle extends Component {
   getInfo = async () => {
     const data = await chainState.getOracles();
     if (data) {
+      if (data.sgs) {
+        for (let i = 0; i < data.sgs.length; i++) {
+          const table =  data.sgs[i]
+          const ids = table.data.find(i => i.name === 'endTime')
+          const emptyChains = []
+          for (let j = 1; j < table.columns.length; j++) {
+            const chainType = table.columns[j]
+            if (ids[chainType] === '0') {
+              emptyChains.push(chainType)
+            }
+          }
+    
+          table.columns = table.columns.filter(chainType => !emptyChains.includes(chainType))
+    
+          for (let j = 0; j < table.data.length; j++) {
+            for (let chainType in table.data[j]) {
+              if (table.data[j].hasOwnProperty(chainType) && emptyChains.includes(chainType)) {
+                delete table.data[j][chainType];
+              }
+            }
+          }
+        }
+      }
       this.setState(data);
     }
   }

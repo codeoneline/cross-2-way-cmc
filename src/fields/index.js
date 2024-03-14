@@ -20,7 +20,7 @@ class Fields extends Component {
     return (
       <div style={{"margin-bottom": "10px", "background-color": "#121335"}}>
         <Divider orientation="left">{this.props.title}</Divider>
-        <Table bordered={true} columns={columns} dataSource={data} pagination={false} />
+        <Table bordered={true} columns={columns} dataSource={data} pagination={false}/>
       </div>
     )
   }
