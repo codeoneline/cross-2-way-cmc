@@ -14,13 +14,24 @@ class Oracle extends Component {
     const data = await chainState.getOracles();
     if (data) {
       if (data.sgs) {
+        const recentSgs = []
+        // 100 day
+        const curTime = Math.floor(new Date().getTime() / 1000);
+        const during = 8640000
         for (let i = 0; i < data.sgs.length; i++) {
           const table =  data.sgs[i]
-          const ids = table.data.find(i => i.name === 'endTime')
+          // {"name":"endTime","VC":"0","WAN":"1602838195","TRON":"0","ARB":"0","AVAX":"1602838195","NRG":"0","ZKETH":"0","TLOS":"0","XDC":"0","ETH":"0","BASEETH":"0","MATIC":"0","FTM":"0","METIS":"0","FX":"0","BSC":"1602838195","OKB":"0","OPT":"0","OKT":"0","MATICETH":"0","DEV":"0","GTH":"0","ZEN":"0","ASTR":"0","CLV":"0"}
+          const endTimes = table.data.find(i => i.name === 'endTime')
           const emptyChains = []
           for (let j = 1; j < table.columns.length; j++) {
             const chainType = table.columns[j]
-            if (ids[chainType] === '0') {
+            if (chainType === "WAN") {
+              const endTime = parseInt(endTimes)
+              if (endTime > curTime - during) {
+                recentSgs.push(table)
+              }
+            }
+            if (endTimes[chainType] === '0') {
               emptyChains.push(chainType)
             }
           }
@@ -35,6 +46,7 @@ class Oracle extends Component {
             }
           }
         }
+        data.sgs = recentSgs
       }
       this.setState(data);
     }
