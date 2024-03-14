@@ -23,14 +23,20 @@ class Oracle extends Component {
           // {"name":"endTime","VC":"0","WAN":"1602838195","TRON":"0","ARB":"0","AVAX":"1602838195","NRG":"0","ZKETH":"0","TLOS":"0","XDC":"0","ETH":"0","BASEETH":"0","MATIC":"0","FTM":"0","METIS":"0","FX":"0","BSC":"1602838195","OKB":"0","OPT":"0","OKT":"0","MATICETH":"0","DEV":"0","GTH":"0","ZEN":"0","ASTR":"0","CLV":"0"}
           const endTimes = table.data.find(i => i.name === 'endTime')
           const endTime = parseInt(endTimes['WAN'])
-          if (endTime > curTime - during) {
-            recentSgs.push(table)
+          if (endTime <= curTime - during) {
+            continue
           }
+          recentSgs.push(table)
+
+          const statuses = table.data.find(i => i.name === 'status')
+          const status = parseInt(statuses['WAN'])
           const emptyChains = []
           for (let j = 1; j < table.columns.length; j++) {
             const chainType = table.columns[j]
-            if (endTimes[chainType] === '0') {
-              emptyChains.push(chainType)
+            if (status !== 5 && status !== 6 ) {
+              if (endTimes[chainType] === '0') {
+                emptyChains.push(chainType)
+              }
             }
           }
     
