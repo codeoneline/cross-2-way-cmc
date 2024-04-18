@@ -1,0 +1,45 @@
+.navbar {  
+  list-style: none;  
+  padding: 0;  
+  margin: 0;  
+}  
+  
+.navbar-item {  
+  display: inline-block;  
+  position: relative;  
+  background-color: #fff;  
+  padding: 10px;  
+  cursor: pointer;  
+}  
+  
+.navbar-item:hover > .submenu {  
+  display: block;  
+}  
+  
+.submenu {  
+  display: none;  
+  position: absolute;  
+  top: 100%;  
+  left: 0;  
+  background-color: #fff;  
+  padding: 0;  
+  list-style: none;  
+  z-index: 1;  
+}  
+  
+.submenu li {  
+  padding: 10px;  
+  border-bottom: 1px solid #ccc;  
+}  
+  
+.submenu li:last-child {  
+  border-bottom: none;  
+}
+
+.submenu li:hover {  
+  background-color: rgb(230, 97, 148); 
+}
+
+.submenu li.active {  
+  background-color: blue;
+}

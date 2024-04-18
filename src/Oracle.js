@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import './App.css';
+import './Oracle.css';
 import Chains from './chains';
 import Oracles from './oracles';
 import TokenManagers from './tokenManagers';
 import chainState from './utils/chain-state'
 
-class App extends Component {
+class Oracle extends Component {
 
   refreshTokenPairs = (e) => {
     e.preventDefault();
@@ -18,6 +18,7 @@ class App extends Component {
       <>
         <div className='app'>
           <div className='title'>
+            <a href="./fee.js">fee</a>
             <div>cross chain oracle tokenManager contract states    <button onClick={ this.refreshTokenPairs }>tokenPair的数量没变, 但内容变时, 请点我手动更新!</button></div>
             
           </div>
@@ -32,4 +33,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Oracle;

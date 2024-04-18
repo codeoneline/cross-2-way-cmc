@@ -1,0 +1,80 @@
+
+
+.center-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /*弹性项们 在主轴   方向 居中 */
+  align-items: center;       /*弹性项们 在主轴垂直方向 居中 */
+  height: 100vh; /* 父容器的高度设置为视窗高度 */
+}
+
+.center-div {
+  margin-top: 50px;  
+  color: #f00;
+  margin-bottom: 25px;  
+}
+
+.main-content {  
+  margin-top: 20px;  
+  text-align: center;  
+  border: 1px solid #ccc;  
+  padding: 20px;  
+} 
+
+.check {
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+  /* list-style: none;   */
+  padding: 10;  
+  margin: 20;  
+}  
+
+.navbar {
+  display: flex;
+  align-items: left;
+  justify-content: flex-start;
+  list-style: none;  
+  padding: 0;  
+  margin: 0;  
+}  
+  
+.navbar-item {  
+  display: inline-block;  
+  position: relative;
+  padding: 10px;  
+  cursor: pointer;
+  text-decoration: underline;
+}  
+  
+.navbar-item:hover > .submenu {  
+  display: block;  
+}  
+  
+.submenu {  
+  display: none;  
+  position: absolute;  
+  top: 100%;  
+  left: 0;  
+  background-color: #77a;  
+  padding: 0;  
+  list-style: none;  
+  z-index: 1;  
+}  
+  
+.submenu li {  
+  padding: 10px;  
+  border-bottom: 1px solid #ccc;  
+}  
+  
+.submenu li:last-child {  
+  border-bottom: none;  
+}
+
+.submenu li:hover {  
+  background-color: rgb(97, 183, 230); 
+}
+
+.submenu li.active {  
+  background-color: blue;
+}

@@ -1,0 +1,26 @@
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  padding: 0;  
+  margin: 0;  
+}  
+  
+.nav-links li {  
+  display: inline-block;  
+  position: relative;  
+  padding: 10px;  
+  cursor: pointer;
+  text-decoration: underline;
+}  
+  
+.nav-links li a {  
+  text-decoration: none; /* 移除链接的下划线 */  
+  color: inherit; /* 继承父元素的文本颜色 */  
+
+  font-size: 2rem; /* 设置字体大小为1.2倍基准字体大小 */ 
+}
+.nav-links li:hover {  
+  background-color: rgb(97, 183, 230); 
+}

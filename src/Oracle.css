@@ -9,7 +9,7 @@
 */
 /* xs sm md lg xl ：<768 <992 <1200 <1600 1600+ */
 /* ipad iphone: only max-device-width orientation: portrait landscape*/
-@media only screen and (max-width: 768px) {
+/* @media only screen and (max-width: 768px) {
   html { font-size: 10px; }
 }
 
@@ -28,13 +28,7 @@
 }
 @media only screen and (min-width: 2401px) {
   html { font-size: 18px; }
-}
-
-body {
-  background-color: #7dbcea;
-  color: #fff;
-  text-align: center;
-}
+} */
 
 .app {
   display: grid;
