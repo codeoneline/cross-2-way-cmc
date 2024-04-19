@@ -141,6 +141,9 @@ function FeeChart({data, curTx, prices, time}) {
   const [isDestPrice, setIsDestPrice] = useState(false);
   const [isSrcPriceMy, setIsSrcPriceMy] = useState(false);
   const [isDestPriceMy, setIsDestPriceMy] = useState(false);
+
+  const [isUsdt, setIsUsdt] = useState(true);
+
   const [isIncomeUsdt, setIsIncomeUsdt] = useState(true);
   const [isOutcomeUsdt, setIsOutcomeUsdt] = useState(true);
   const [isCostUsdt, setIsCostUsdt] = useState(false);
@@ -164,6 +167,11 @@ function FeeChart({data, curTx, prices, time}) {
   const handleIsDestPriceMyChange = (event) => {  
     setIsDestPriceMy(event.target.checked);  
   };  
+
+  const handleIsUsdt = (event) => {  
+    setIsUsdt(event.target.checked);  
+  };  
+
   const handleIsIncomeUsdtChange = (event) => {  
     setIsIncomeUsdt(event.target.checked);  
   };  
@@ -185,8 +193,7 @@ function FeeChart({data, curTx, prices, time}) {
   let srcPricesMyYAxis = <YAxis />
   let destPricesMyYAxis = <YAxis />
   let incomeUsdtYAxis = <YAxis />
-  let costUsdtYAxis = <YAxis />
-  // let pureIncomeUsdtYAxis = <YAxis />
+  let outcomeUsdtYAxis = <YAxis />
 
   xAxis =  <XAxis dataKey="time" domain={[time, time + duration]} tickFormatter={tickFormatter} orientation="bottom" offset={0}/>
 
@@ -215,17 +222,23 @@ function FeeChart({data, curTx, prices, time}) {
   destPricesMyYAxis = <YAxis hide={!isDestPriceMy} yAxisId="destPriceMy" domain={[destPriceMyMin * 0.9, destPriceMyMax * 1.1]} stroke="#dd82dd" orientation="right"/>
   console.log(`destPriceMyMin = ${destPriceMyMin}, destPriceMyMax = ${destPriceMyMax}`)
 
-  let [incomeUsdtMin, incomeUsdtMax] = getMinMax(data, 'incomeUsdt')
-  let [outcomeUsdtMin, outcomeUsdtMax] = getMinMax(data, 'outcomeUsdt')
-  let [pureIncomeUsdtMin, pureIncomeUsdtMax] = getMinMax(data, 'pureIncomeUsdt')
-  let usdtMin = Math.min(incomeUsdtMin, outcomeUsdtMin, pureIncomeUsdtMin)
-  let usdtMax = Math.max(incomeUsdtMax, outcomeUsdtMax, pureIncomeUsdtMax)
-  incomeUsdtYAxis = <YAxis hide={!isIncomeUsdt  && !isOutcomeUsdt} yAxisId="usdt" domain={[usdtMin * 0.9, usdtMax * 1.1]} stroke="#dd2222" orientation="right"/>
-  console.log(`incomeUsdtMin = ${incomeUsdtMin}, incomeUsdtMax = ${incomeUsdtMax}`)
-  console.log(`outcomeUsdtMin = ${outcomeUsdtMin}, outcomeUsdtMax = ${outcomeUsdtMax}`)
 
-  let [costUsdtMin, costUsdtMax] = getMinMax(data, 'costUsdt')
-  costUsdtYAxis = <YAxis hide={!isCostUsdt} yAxisId="costUsdt" domain={[costUsdtMin * 0.9, costUsdtMax * 1.1]} stroke="#a288dd" orientation="left" />
+  let [costUsdtMin, costUsdtMax] = getMinMax(data, isUsdt ? 'costUsdt' : 'cost')
+  let [incomeUsdtMin, incomeUsdtMax] = getMinMax(data, isUsdt ? 'incomeUsdt' : 'income')
+  let [outcomeUsdtMin, outcomeUsdtMax] = getMinMax(data, isUsdt ? 'outcomeUsdt' : 'outcome')
+  let [pureIncomeUsdtMin, pureIncomeUsdtMax] = getMinMax(data, isUsdt ? 'pureIncomeUsdt' : 'pureIncome')
+  if (isUsdt) {
+    let usdtMin = Math.min(incomeUsdtMin, outcomeUsdtMin, pureIncomeUsdtMin, costUsdtMin)
+    let usdtMax = Math.max(incomeUsdtMax, outcomeUsdtMax, pureIncomeUsdtMax, costUsdtMax)
+    incomeUsdtYAxis = <YAxis hide={!isIncomeUsdt  && !isOutcomeUsdt && !isPureIncomeUsdt && !isCostUsdt} yAxisId="usdt" domain={[usdtMin * 0.9, usdtMax * 1.1]} stroke="#dd2222" orientation="right"/>
+    console.log(`incomeUsdtMin = ${incomeUsdtMin}, incomeUsdtMax = ${incomeUsdtMax}`)
+    console.log(`outcomeUsdtMin = ${outcomeUsdtMin}, outcomeUsdtMax = ${outcomeUsdtMax}`)
+  } else {
+    let usdtMin = Math.min(incomeUsdtMin, pureIncomeUsdtMin, costUsdtMin)
+    let usdtMax = Math.max(incomeUsdtMax, pureIncomeUsdtMax, costUsdtMax)
+    incomeUsdtYAxis = <YAxis hide={!isIncomeUsdt  && !isPureIncomeUsdt && !isCostUsdt} yAxisId="usdt" domain={[usdtMin * 0.9, usdtMax * 1.1]} stroke="#dd2222" orientation="right"/>
+    outcomeUsdtYAxis = <YAxis hide={!isOutcomeUsdt} yAxisId="outcome" domain={[outcomeUsdtMin * 0.9, outcomeUsdtMax * 1.1]} stroke="#dd2222" orientation="left"/>
+  }
   console.log(`costUsdtMin = ${costUsdtMin}, costUsdtMax = ${costUsdtMax}`)
 
   // pureIncomeUsdtYAxis = <YAxis hide={!isPureIncomeUsdt} yAxisId="pureIncomeUsdt" domain={[pureIncomeUsdtMin * 0.9, pureIncomeUsdtMax * 1.1]} stroke="#dd82dd" orientation="right"/>
@@ -245,15 +258,18 @@ function FeeChart({data, curTx, prices, time}) {
         <input type="checkbox" checked={isSrcPriceMy} onChange={handleIsSrcPriceMyTxChange}/> srcPriceMy&nbsp;&nbsp;
         <input type="checkbox" checked={isDestPriceMy} onChange={handleIsDestPriceMyChange}/> destPriceMy&nbsp;&nbsp;
 
-        <input type="checkbox" checked={isCostUsdt} onChange={handleIsCostUsdtChange}/> feeTxCost&nbsp;&nbsp;
-        <input type="checkbox" checked={isPureIncomeUsdt} onChange={handleIsPureIncomeUsdtChange}/> pureIncome&nbsp;&nbsp;
+        <input type="checkbox" checked={isUsdt} onChange={handleIsUsdt}/> usdt&nbsp;&nbsp;
 
-        <input type="checkbox" checked={isIncomeUsdt} onChange={handleIsIncomeUsdtChange}/> income&nbsp;&nbsp;
-        <input type="checkbox" checked={isOutcomeUsdt} onChange={handleIsOutcomeUsdtChange}/> outcome&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="checkbox" checked={isCostUsdt} onChange={handleIsCostUsdtChange}/> 执行消耗&nbsp;&nbsp;
+        <input type="checkbox" checked={isPureIncomeUsdt} onChange={handleIsPureIncomeUsdtChange}/> 纯收入&nbsp;&nbsp;
 
+        <input type="checkbox" checked={isIncomeUsdt} onChange={handleIsIncomeUsdtChange}/> 收入&nbsp;&nbsp;
+        <input type="checkbox" checked={isOutcomeUsdt} onChange={handleIsOutcomeUsdtChange}/> 支出&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+      </div>
+      <div>
         7天总收入: {income ? income.income : '0'}&nbsp; {curTx.srcChainType}&nbsp;最新价格&nbsp;{prices.srcPrice}$&nbsp;&nbsp;&nbsp;&nbsp;
         7天总支出: {outcome ? outcome.outcome : '0'}&nbsp;{curTx.destChainType}&nbsp;最新价格&nbsp;{prices.destPrice}$&nbsp;&nbsp;&nbsp;&nbsp;
-
       </div>
 
       <LineChart width={2000} height={800} data={data} margin={{ top: 5, right: 30, left: 200, bottom: 5 }}>  
@@ -264,9 +280,8 @@ function FeeChart({data, curTx, prices, time}) {
         {destPricesYAxis}
         {srcPricesMyYAxis}
         {destPricesMyYAxis}
-        {costUsdtYAxis}
-        {/* {pureIncomeUsdtYAxis} */}
         {incomeUsdtYAxis}
+        {outcomeUsdtYAxis}
 
         <CartesianGrid strokeDasharray="3 3" /> 
         
@@ -278,11 +293,11 @@ function FeeChart({data, curTx, prices, time}) {
         <Line hide={!isSrcPriceMy} yAxisId="srcPriceMy" type="monotone" dataKey="srcPriceMy" stroke="#a222dd" connectNulls />  
         <Line hide={!isDestPriceMy} yAxisId="destPriceMy" type="monotone" dataKey="destPriceMy" stroke="#dd82dd" connectNulls />  
 
-        <Line hide={!isCostUsdt} yAxisId="costUsdt" type="monotone" dataKey="costUsdt" stroke="#a288dd" connectNulls />  
-        <Line hide={!isPureIncomeUsdt} yAxisId="usdt" type="monotone" dataKey="pureIncomeUsdt" stroke="#dd82dd" connectNulls />  
+        <Line hide={!isCostUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "costUsdt" : "cost" } stroke="#a288dd" connectNulls />  
+        <Line hide={!isPureIncomeUsdt} yAxisId="usdt" type="monotone" dataKey={isUsdt ? "pureIncomeUsdt" : "pureIncome"} stroke="#dd82dd" connectNulls />  
 
-        <Line hide={!isIncomeUsdt} yAxisId="usdt" type="monotone" dataKey="incomeUsdt" stroke="#dd2222" connectNulls />  
-        <Line hide={!isOutcomeUsdt} yAxisId="usdt" type="monotone" dataKey="outcomeUsdt" stroke="#22dd22" connectNulls />  
+        <Line hide={!isIncomeUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "incomeUsdt" : "income"} stroke="#dd2222" connectNulls />  
+        <Line hide={!isOutcomeUsdt} yAxisId={isUsdt ? "usdt" : "outcome"} type="monotone" dataKey={ isUsdt ? "outcomeUsdt": "outcome" } stroke="#22dd22" connectNulls />  
         {/* <Tooltip content={<CustomTooltip />}/> */}
         <Tooltip />
         <Legend />
