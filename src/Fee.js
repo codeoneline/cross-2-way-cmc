@@ -223,23 +223,24 @@ function FeeChart({data, curTx, prices, time}) {
   console.log(`destPriceMyMin = ${destPriceMyMin}, destPriceMyMax = ${destPriceMyMax}`)
 
 
-  let [costUsdtMin, costUsdtMax] = getMinMax(data, isUsdt ? 'costUsdt' : 'cost')
+  let [costUsdtMin, costUsdtMax] = getMinMax(data, isUsdt ? 'costAllUsdt' : 'costAll')
   let [incomeUsdtMin, incomeUsdtMax] = getMinMax(data, isUsdt ? 'incomeUsdt' : 'income')
   let [outcomeUsdtMin, outcomeUsdtMax] = getMinMax(data, isUsdt ? 'outcomeUsdt' : 'outcome')
   let [pureIncomeUsdtMin, pureIncomeUsdtMax] = getMinMax(data, isUsdt ? 'pureIncomeUsdt' : 'pureIncome')
+  console.log(`costUsdtMin = ${costUsdtMin}, costUsdtMax = ${costUsdtMax}`)
+  console.log(`incomeUsdtMin = ${incomeUsdtMin}, incomeUsdtMax = ${incomeUsdtMax}`)
+  console.log(`outcomeUsdtMin = ${outcomeUsdtMin}, outcomeUsdtMax = ${outcomeUsdtMax}`)
+  console.log(`pureIncomeUsdtMin = ${pureIncomeUsdtMin}, pureIncomeUsdtMax = ${pureIncomeUsdtMax}`)
   if (isUsdt) {
     let usdtMin = Math.min(incomeUsdtMin, outcomeUsdtMin, pureIncomeUsdtMin, costUsdtMin)
     let usdtMax = Math.max(incomeUsdtMax, outcomeUsdtMax, pureIncomeUsdtMax, costUsdtMax)
     incomeUsdtYAxis = <YAxis hide={!isIncomeUsdt  && !isOutcomeUsdt && !isPureIncomeUsdt && !isCostUsdt} yAxisId="usdt" domain={[usdtMin * 0.9, usdtMax * 1.1]} stroke="#dd2222" orientation="right"/>
-    console.log(`incomeUsdtMin = ${incomeUsdtMin}, incomeUsdtMax = ${incomeUsdtMax}`)
-    console.log(`outcomeUsdtMin = ${outcomeUsdtMin}, outcomeUsdtMax = ${outcomeUsdtMax}`)
   } else {
     let usdtMin = Math.min(incomeUsdtMin, pureIncomeUsdtMin, costUsdtMin)
     let usdtMax = Math.max(incomeUsdtMax, pureIncomeUsdtMax, costUsdtMax)
     incomeUsdtYAxis = <YAxis hide={!isIncomeUsdt  && !isPureIncomeUsdt && !isCostUsdt} yAxisId="usdt" domain={[usdtMin * 0.9, usdtMax * 1.1]} stroke="#dd2222" orientation="right"/>
     outcomeUsdtYAxis = <YAxis hide={!isOutcomeUsdt} yAxisId="outcome" domain={[outcomeUsdtMin * 0.9, outcomeUsdtMax * 1.1]} stroke="#dd2222" orientation="left"/>
   }
-  console.log(`costUsdtMin = ${costUsdtMin}, costUsdtMax = ${costUsdtMax}`)
 
   // pureIncomeUsdtYAxis = <YAxis hide={!isPureIncomeUsdt} yAxisId="pureIncomeUsdt" domain={[pureIncomeUsdtMin * 0.9, pureIncomeUsdtMax * 1.1]} stroke="#dd82dd" orientation="right"/>
 
@@ -293,7 +294,7 @@ function FeeChart({data, curTx, prices, time}) {
         <Line hide={!isSrcPriceMy} yAxisId="srcPriceMy" type="monotone" dataKey="srcPriceMy" stroke="#a222dd" connectNulls />  
         <Line hide={!isDestPriceMy} yAxisId="destPriceMy" type="monotone" dataKey="destPriceMy" stroke="#dd82dd" connectNulls />  
 
-        <Line hide={!isCostUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "costUsdt" : "cost" } stroke="#a288dd" connectNulls />  
+        <Line hide={!isCostUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "costAllUsdt" : "costAll" } stroke="#a288dd" connectNulls />  
         <Line hide={!isPureIncomeUsdt} yAxisId="usdt" type="monotone" dataKey={isUsdt ? "pureIncomeUsdt" : "pureIncome"} stroke="#dd82dd" connectNulls />  
 
         <Line hide={!isIncomeUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "incomeUsdt" : "income"} stroke="#dd2222" connectNulls />  
@@ -508,9 +509,9 @@ const Fee = () => {
 
       if (i.cost) {
         cost = cost.plus(i.cost)
-        i.cost = cost.toString()
+        i.costAll = cost.toString()
         if (i.srcPrice) {
-          i.costUsdt = cost.multipliedBy(i.srcPrice).toString()
+          i.costAllUsdt = cost.multipliedBy(i.srcPrice).toString()
         } else {
         }
 
