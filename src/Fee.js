@@ -134,7 +134,7 @@ function Navigation({ data, curTx, onMenuClick }) {
 //   return null;
 // };
 
-function FeeChart({data, curTx, prices, time}) {
+function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
   const [isTx, setIsTx] = useState(false);
   const [isContractFee, setIsContractFee] = useState(false);
   const [isSrcPrice, setIsSrcPrice] = useState(false);
@@ -247,7 +247,43 @@ function FeeChart({data, curTx, prices, time}) {
   /// latest label
   const income = data.filter(item => "income" in item).pop();
   const outcome = data.filter(item => "outcome" in item).pop();
-
+  console.log(`lastTx = ${JSON.stringify(lastTx, null, 2)}`)
+  console.log(`lastFee = ${JSON.stringify(lastFee, null, 2)}`)
+  // lastTx = {
+  //   "timestamp": 1713461470,
+  //   "srcChainID": 2153201998,
+  //   "destChainID": 2147483648,
+  //   "gasUsed": 212,
+  //   "gasPrice": "144.716981132075",
+  //   "fee": "0.0003068",
+  //   "srcPrice": "0.2638886666666666666676",
+  //   "destPrice": "63399.9166666666666673",
+  //   "storeMan": "0x000000000000000000000000000000000000000000000041726965735f303431",
+  //   "tokenPair": "15",
+  //   "direction": "Outbound",
+  //   "lockHash": "0xa4f6c624a82e3c3063f5d1c4f630498b7c0720888540b883f2aadc60e0416093",
+  //   "refundHash": "8809d1b3c408b6413d07d4fec2ff6755a05b7bac30e055e640351e784ab462b3",
+  //   "time": 1713461470000,
+  //   "srcChainType": "WAN",
+  //   "destChainType": "BTC"
+  // }
+  // Fee.js:251 lastFee = {
+  //   "time": 1713511840000,
+  //   "block": 30931330,
+  //   "srcChainID": 2153201998,
+  //   "destChainID": 2147483648,
+  //   "marketState": "gasPriceDown",
+  //   "srcPrice": "0.2641830416666665",
+  //   "destPrice": "62587.26666666667",
+  //   "destGasPrice": "66.64365277777777",
+  //   "newFeesInUsdt": "26.899230036575463794355060885194010615",
+  //   "contractFee": 101.82042672714634,
+  //   "agentFee": "0",
+  //   "hash": "0x6e650fd80644f96eff54337f52612e65de0f6ea420097468f4fb77542e5e8264",
+  //   "cost": "0.0001205928"
+  // }
+  const lastContractFee = lastFee ? lastFee.contractFee : 0
+  const lastTxFee = lastTx ? lastTx.fee : 0
   return (  
     <div>
       <div className="check">
@@ -269,8 +305,18 @@ function FeeChart({data, curTx, prices, time}) {
 
       </div>
       <div>
-        7天总收入: {income ? income.income : '0'}&nbsp; {curTx.srcChainType}&nbsp;最新价格&nbsp;{prices.srcPrice}$&nbsp;&nbsp;&nbsp;&nbsp;
-        7天总支出: {outcome ? outcome.outcome : '0'}&nbsp;{curTx.destChainType}&nbsp;最新价格&nbsp;{prices.destPrice}$&nbsp;&nbsp;&nbsp;&nbsp;
+        {curTx.srcChainType}&nbsp;最新价格&nbsp;{latest.srcPrice} &nbsp;&nbsp;&nbsp;&nbsp;
+        {curTx.destChainType}&nbsp;最新价格&nbsp;{latest.destPrice} &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+      <div>
+        7天总收入: {income ? income.income : '0'}&nbsp;{curTx.srcChainType}&nbsp;&nbsp;&nbsp;&nbsp;
+        7天总支出: {outcome ? outcome.outcome : '0'}&nbsp;{curTx.destChainType}&nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+      <div>
+      交易最新实际消耗: {lastTxFee} {curTx.destChainType}&nbsp;&nbsp; {BigNumber(lastTxFee).multipliedBy(latest.destPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+      <div>
+      合约收费最新设置: {lastContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(lastContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
 
       <LineChart width={2000} height={800} data={data} margin={{ top: 5, right: 30, left: 200, bottom: 5 }}>  
@@ -312,7 +358,7 @@ const Fee = () => {
   const [chains, setChains] = useState([]);
   const [feeSrcDest, setFeeSrcDest] = useState({});
   // const [curTx, setCurTx] = useState({ srcChainType: 'ARETH', destChainType: 'BNB', srcChainID: 1073741826, destChainID : 2147484362 })
-  const [curTx, setCurTx] = useState({ srcChainType: 'WAN', destChainType: 'BTC', srcChainID: 2153201998, destChainID : 2147483648 })
+  const [curTx, setCurTx] = useState({ srcChainType : 'WAN', destChainType: 'BTC', srcChainID: 2153201998, destChainID : 2147483648 })
   const [time, setTime] = useState(0)
   const [firstOldFee, setFirstOldFee] = useState(null)
 
@@ -434,9 +480,13 @@ const Fee = () => {
     console.log(`destChainType = ${destChainType}, type = ${typeof destChainType}`)
     console.log(`data.fees ${JSON.stringify(data.fees)}`)
     const fees = data.fees.filter(i => (i.srcChainID === srcChainID && i.destChainID === destChainID))
+    fees.sort((a, b)=>(a.time - b.time))
+    const lastFee = fees.length > 0 ? fees[fees.length - 1] : null
     console.log(fees)
     console.log(`data.txs ${JSON.stringify(data.txs)}`)
     const txs = data.txs.filter(i => (i.srcChainID === srcChainID && i.destChainID === destChainID ))
+    txs.sort((a, b)=>(a.timestamp - b.timestamp))
+    const lastTx = txs.length > 0 ? txs[txs.length - 1] : null
     console.log(txs)
   
     // const feeData = merge(fees, txs, srcPrices, destPrices, destGasPrices, srcChainID, destChainID)
@@ -532,7 +582,7 @@ const Fee = () => {
   
     const latestSrcPrice = srcPrices[srcPrices.length - 1]
     const latestDestPrice = destPrices[destPrices.length - 1]
-    const chart = <FeeChart data ={ feeData } curTx = { curTx} time = {time} prices = {{srcPrice: latestSrcPrice ? latestSrcPrice.price : 'noDate', destPrice: latestDestPrice ? latestDestPrice.price : 'noDate'}}/>
+    const chart = <FeeChart data ={ feeData } curTx = { curTx} lastTx = { lastTx } lastFee = { lastFee } time = {time} latest = {{srcPrice: latestSrcPrice ? latestSrcPrice.price : 'noDate', destPrice: latestDestPrice ? latestDestPrice.price : 'noDate'}}/>
   
     return (
       <div className='center-container'>
