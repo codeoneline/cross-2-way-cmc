@@ -135,22 +135,28 @@ function Navigation({ data, curTx, onMenuClick }) {
 // };
 
 function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
-  const [isTx, setIsTx] = useState(false);
+  const [isTx, setIsTx] = useState(true);
+  const [isTxMy, setIsTxMy] = useState(true);
   const [isContractFee, setIsContractFee] = useState(false);
   const [isSrcPrice, setIsSrcPrice] = useState(false);
   const [isDestPrice, setIsDestPrice] = useState(false);
   const [isSrcPriceMy, setIsSrcPriceMy] = useState(false);
   const [isDestPriceMy, setIsDestPriceMy] = useState(false);
+  const [isGasPrice, setIsGasPrice] = useState(false);
+  const [isGasPriceMy, setIsGasPriceMy] = useState(false);
 
   const [isUsdt, setIsUsdt] = useState(true);
 
-  const [isIncomeUsdt, setIsIncomeUsdt] = useState(true);
-  const [isOutcomeUsdt, setIsOutcomeUsdt] = useState(true);
+  const [isIncomeUsdt, setIsIncomeUsdt] = useState(false);
+  const [isOutcomeUsdt, setIsOutcomeUsdt] = useState(false);
   const [isCostUsdt, setIsCostUsdt] = useState(false);
   const [isPureIncomeUsdt, setIsPureIncomeUsdt] = useState(false);
   
   const handleIsTxChange = (event) => {  
     setIsTx(event.target.checked);  
+  };  
+  const handleIsTxMyChange = (event) => {  
+    setIsTxMy(event.target.checked);  
   };  
   const handleIsContractFeeChange = (event) => {  
     setIsContractFee(event.target.checked);  
@@ -166,6 +172,12 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
   };  
   const handleIsDestPriceMyChange = (event) => {  
     setIsDestPriceMy(event.target.checked);  
+  };  
+  const handleIsGasPriceTxChange = (event) => {  
+    setIsGasPrice(event.target.checked);  
+  };  
+  const handleIsGasPriceMyChange = (event) => {  
+    setIsGasPriceMy(event.target.checked);  
   };  
 
   const handleIsUsdt = (event) => {  
@@ -192,14 +204,20 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
   let destPricesYAxis = <YAxis />
   let srcPricesMyYAxis = <YAxis />
   let destPricesMyYAxis = <YAxis />
+  let gasPriceYAxis = <YAxis />
+  // let gasPriceMyYAxis = <YAxis />
   let incomeUsdtYAxis = <YAxis />
   let outcomeUsdtYAxis = <YAxis />
 
   xAxis =  <XAxis dataKey="time" domain={[time, time + duration]} tickFormatter={tickFormatter} orientation="bottom" offset={0}/>
 
   let [txsFeeMin, txsFeeMax] = getMinMax(data, 'fee')
-  txFeeYAxis = <YAxis hide={!isTx} yAxisId="txFee" domain={[txsFeeMin * 0.9, txsFeeMax * 1.1]} stroke="#dddd22" orientation="left" />
+  let [txsFeeMyMin, txsFeeMyMax] = getMinMax(data, 'feeMy')
   console.log(`txsFeeMin = ${txsFeeMin}, txsFeeMax = ${txsFeeMax}`)
+  console.log(`txsFeeMyMin = ${txsFeeMyMin}, txsFeeMyMax = ${txsFeeMyMax}`)
+  let feeMin = Math.min(txsFeeMin, txsFeeMyMin)
+  let feeMax = Math.max(txsFeeMax, txsFeeMyMax)
+  txFeeYAxis = <YAxis hide={!isTx} yAxisId="txFee" domain={[feeMin * 0.9, feeMax * 1.1]} stroke="#dddd22" orientation="left" />
 
   let [cFeesMin, cFeesMax] = getMinMax(data, 'contractFee')
   cFeeYAxis = <YAxis hide={!isContractFee} yAxisId="contractFee" domain={[cFeesMin * 0.9, cFeesMax * 1.1]} stroke="#22dddd" orientation="right" offset={0} />
@@ -221,6 +239,16 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
   let [destPriceMyMin, destPriceMyMax] = getMinMax(data, 'destPriceMy')
   destPricesMyYAxis = <YAxis hide={!isDestPriceMy} yAxisId="destPriceMy" domain={[destPriceMyMin * 0.9, destPriceMyMax * 1.1]} stroke="#dd82dd" orientation="right"/>
   console.log(`destPriceMyMin = ${destPriceMyMin}, destPriceMyMax = ${destPriceMyMax}`)
+
+  let [gasPriceMin, gasPriceMax] = getMinMax(data, 'gasPrice')
+  let [gasPriceMyMin, gasPriceMyMax] = getMinMax(data, 'gasPriceMy')
+  console.log(`gasPriceMin = ${gasPriceMin}, gasPriceMax = ${gasPriceMax}`)
+  console.log(`gasPriceMyMin = ${gasPriceMyMin}, gasPriceMyMax = ${gasPriceMyMax}`)
+  let gpMin = Math.min(gasPriceMin, gasPriceMyMin)
+  let gpMax = Math.max(gasPriceMax, gasPriceMyMax)
+  gasPriceYAxis = <YAxis hide={!isGasPrice && !isGasPriceMy} yAxisId="gasPrice" domain={[gpMin * 0.9, gpMax * 1.1]} stroke="#a222dd" orientation="left" />
+
+  // gasPriceMyYAxis = <YAxis hide={!isGasPriceMy} yAxisId="gasPriceMy" domain={[gasPriceMyMin * 0.9, gasPriceMyMax * 1.1]} stroke="#dd82dd" orientation="right"/>
 
 
   let [costUsdtMin, costUsdtMax] = getMinMax(data, isUsdt ? 'costAllUsdt' : 'costAll')
@@ -288,12 +316,16 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
     <div>
       <div className="check">
         <input type="checkbox" checked={isTx} onChange={handleIsTxChange}/> tx&nbsp;&nbsp;
+        <input type="checkbox" checked={isTxMy} onChange={handleIsTxMyChange}/> txMy&nbsp;&nbsp;
         <input type="checkbox" checked={isContractFee} onChange={handleIsContractFeeChange}/> contra&nbsp;&nbsp;
         <input type="checkbox" checked={isSrcPrice} onChange={handleIsSrcPriceTxChange}/> srcPrice&nbsp;&nbsp;
         <input type="checkbox" checked={isDestPrice} onChange={handleIsDestPriceChange}/> destPrice&nbsp;&nbsp;
 
         <input type="checkbox" checked={isSrcPriceMy} onChange={handleIsSrcPriceMyTxChange}/> srcPriceMy&nbsp;&nbsp;
         <input type="checkbox" checked={isDestPriceMy} onChange={handleIsDestPriceMyChange}/> destPriceMy&nbsp;&nbsp;
+
+        <input type="checkbox" checked={isGasPrice} onChange={handleIsGasPriceTxChange}/> gasPrice&nbsp;&nbsp;
+        <input type="checkbox" checked={isGasPriceMy} onChange={handleIsGasPriceMyChange}/> gasPriceMy&nbsp;&nbsp;
 
         <input type="checkbox" checked={isUsdt} onChange={handleIsUsdt}/> usdt&nbsp;&nbsp;
 
@@ -327,18 +359,23 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
         {destPricesYAxis}
         {srcPricesMyYAxis}
         {destPricesMyYAxis}
+        {gasPriceYAxis}
         {incomeUsdtYAxis}
         {outcomeUsdtYAxis}
 
         <CartesianGrid strokeDasharray="3 3" /> 
         
         <Line hide={!isTx} yAxisId="txFee" type="monotone" dataKey="fee" stroke="#dddd22" connectNulls />  
+        <Line hide={!isTxMy} yAxisId="txFee" type="monotone" dataKey="feeMy" stroke="#22dddd" connectNulls />  
         <Line hide={!isContractFee} yAxisId="contractFee" type="monotone" dataKey="contractFee" stroke="#22dddd" connectNulls /> 
         <Line hide={!isSrcPrice} yAxisId="srcPrice" type="monotone" dataKey="srcPrice" stroke="#2222dd" connectNulls />  
         <Line hide={!isDestPrice} yAxisId="destPrice" type="monotone" dataKey="destPrice" stroke="#dd22dd" connectNulls />  
 
         <Line hide={!isSrcPriceMy} yAxisId="srcPriceMy" type="monotone" dataKey="srcPriceMy" stroke="#a222dd" connectNulls />  
         <Line hide={!isDestPriceMy} yAxisId="destPriceMy" type="monotone" dataKey="destPriceMy" stroke="#dd82dd" connectNulls />  
+
+        <Line hide={!isGasPrice} yAxisId="gasPrice" type="monotone" dataKey="gasPrice" stroke="#a222dd" connectNulls />  
+        <Line hide={!isGasPriceMy} yAxisId="gasPrice" type="monotone" dataKey="gasPriceMy" stroke="#dd82dd" connectNulls />  
 
         <Line hide={!isCostUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "costAllUsdt" : "costAll" } stroke="#a288dd" connectNulls />  
         <Line hide={!isPureIncomeUsdt} yAxisId="usdt" type="monotone" dataKey={isUsdt ? "pureIncomeUsdt" : "pureIncome"} stroke="#dd82dd" connectNulls />  
@@ -419,6 +456,8 @@ const Fee = () => {
 
           i.srcChainType = srcChainType
           i.destChainType = destChainType
+
+          // TODO: 插值出来我的gasPrice
         })
         /// price
         const prices = await chainState.getPrices(time)
@@ -473,7 +512,7 @@ const Fee = () => {
   
     const srcPrices = data.prices.filter(i => (i.bip44 === srcChainID)).sort((a, b)=>(a.time - b.time))
     const destPrices = data.prices.filter(i => (i.bip44 === destChainID)).sort((a, b)=>(a.time - b.time))
-    // const destGasPrices = data.gasPrices.filter(i => (i.bip44 === destChainID))
+    const destGasPrices = data.gasPrices.filter(i => (i.bip44 === destChainID)).sort((a, b)=>(a.time - b.time))
     console.log(`srcChainID = ${srcChainID}, type = ${typeof srcChainID}`)
     console.log(`destChainID = ${destChainID}, type = ${typeof destChainID}`)
     console.log(`srcChainType = ${srcChainType}, type = ${typeof srcChainType}`)
@@ -511,6 +550,28 @@ const Fee = () => {
       newContractFee = BigNumber(newContractFee.contractFee)
     }
     feeData.forEach(i => {
+      if (i.gasPrice) { 
+        const price = linearInterpolation(destGasPrices, i.time / 1000)
+        if (price) {
+          i.gasPriceMy = price.toNumber()
+        }
+      } 
+
+      if (i.fee) {
+        i.fee = BigNumber(i.fee).toNumber()
+        let times = 1.0
+        if (i.destChainID === 0x80000000) { // BTC
+          // times = 1.5 *  332.0 / 212.0 = 2.35
+          times = 1.8
+        } else if (i.destChainID === 0x80000002 || i.destChainID === 0x80000003) {
+          times = 1
+        }
+        if (i.gasPriceMy && i.gasUsed) {
+          i.feeMy = BigNumber(i.gasPriceMy).multipliedBy(i.gasUsed).multipliedBy(times).dividedBy(chains[i.destChainID].unit).toNumber()
+        } else {
+          // i.feeMy = i.fee
+        }
+      }
       if (!i.srcPriceMy) {
         const price = linearInterpolation(srcPrices, i.time / 1000)
         if (price) {
