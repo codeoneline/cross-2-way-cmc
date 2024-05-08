@@ -554,6 +554,8 @@ const Fee = () => {
         const price = linearInterpolation(destGasPrices, i.time / 1000)
         if (price) {
           i.gasPriceMy = price.toNumber()
+        } else {
+          i.gasPriceMy = BigNumber(i.gasPrice).toNumber()
         }
       } 
 
