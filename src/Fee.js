@@ -520,7 +520,7 @@ const Fee = () => {
     console.log(`data.fees ${JSON.stringify(data.fees)}`)
     const fees = data.fees.filter(i => (i.srcChainID === srcChainID && i.destChainID === destChainID))
     fees.sort((a, b)=>(a.time - b.time))
-    const lastFee = fees.length > 0 ? fees[fees.length - 1] : null
+    const lastFee = fees.length > 0 ? fees[fees.length - 1] : firstOldFee
     console.log(fees)
     console.log(`data.txs ${JSON.stringify(data.txs)}`)
     const txs = data.txs.filter(i => (i.srcChainID === srcChainID && i.destChainID === destChainID ))
@@ -555,6 +555,7 @@ const Fee = () => {
         if (price) {
           i.gasPriceMy = price.toNumber()
         } else {
+          // ada xrp dot sol
           i.gasPriceMy = BigNumber(i.gasPrice).toNumber()
         }
       } 
@@ -562,11 +563,22 @@ const Fee = () => {
       if (i.fee) {
         i.fee = BigNumber(i.fee).toNumber()
         let times = 1.0
+        // ltc doge wan bnb,差距较大
         if (i.destChainID === 0x80000000) { // BTC
           // times = 1.5 *  332.0 / 212.0 = 2.35
           times = 1.8
-        } else if (i.destChainID === 0x80000002 || i.destChainID === 0x80000003) {
-          times = 1
+        } else if (i.destChainID === 0x80000002) {
+        // ltc
+          times = 0.895
+        } else if (i.destChainID === 0x80000003) {
+        // doge
+          times = 0.4
+        } else if (i.destChainID === 2153201998) {
+        // wan 
+          i.gasPriceMy = BigNumber(1000000000).toNumber()
+        } else if (i.destChainID === 2147484362) {
+        // bnb
+          i.gasPriceMy = i.gasPrice
         }
         if (i.gasPriceMy && i.gasUsed) {
           i.feeMy = BigNumber(i.gasPriceMy).multipliedBy(i.gasUsed).multipliedBy(times).dividedBy(chains[i.destChainID].unit).toNumber()
