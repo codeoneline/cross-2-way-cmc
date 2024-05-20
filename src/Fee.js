@@ -134,7 +134,7 @@ function Navigation({ data, curTx, onMenuClick }) {
 //   return null;
 // };
 
-function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestFee }) {
+function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestContractFee }) {
   const [isTx, setIsTx] = useState(true);
   const [isTxMy, setIsTxMy] = useState(true);
   const [isContractFee, setIsContractFee] = useState(false);
@@ -311,7 +311,6 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestFee }) {
   // }
   const lastContractFee = lastFee ? lastFee.contractFee : 0
   const lastTxFee = lastTx ? lastTx.fee : 0
-  const latestFeeReal = latestFee[curTx.srcChainID][curTx.destChainID] ? latestFee[curTx.srcChainID][curTx.destChainID].contractFee : 0
   return (  
     <div>
       <div className="check">
@@ -351,7 +350,7 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestFee }) {
       合约收费最新设置: {lastContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(lastContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
       <div>
-      合约收费最新设置真: {latestFeeReal} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(latestFeeReal).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      合约收费最新设置真: {latestContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(latestContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
 
       <LineChart width={2000} height={800} data={data} margin={{ top: 5, right: 30, left: 200, bottom: 5 }}>  
@@ -672,6 +671,11 @@ const Fee = () => {
   
     const latestSrcPrice = srcPrices[srcPrices.length - 1]
     const latestDestPrice = destPrices[destPrices.length - 1]
+
+    let latestContractFee = '0'
+    if (latestFee[srcChainID] && latestFee[srcChainID][destChainID]) {
+      latestContractFee = BigNumber(latestFee[srcChainID][destChainID].contractFee).dividedBy(chains[srcChainID].unit).toString()
+    }
     const chart = <FeeChart 
       data ={ feeData } 
       curTx = { curTx} 
@@ -679,7 +683,7 @@ const Fee = () => {
       lastFee = { lastFee } 
       time = {time} 
       latest = {{srcPrice: latestSrcPrice ? latestSrcPrice.price : 'noDate', destPrice: latestDestPrice ? latestDestPrice.price : 'noDate'}}
-      latestFee = {latestFee}
+      latestContractFee = {latestContractFee}
       // tj = { tj }
     />
   
