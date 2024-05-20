@@ -311,7 +311,7 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestFee }) {
   // }
   const lastContractFee = lastFee ? lastFee.contractFee : 0
   const lastTxFee = lastTx ? lastTx.fee : 0
-  const latestFeeReal = latestFee[curTx.srcChainID][curTx.destChainID]
+  const latestFeeReal = latestFee[curTx.srcChainID][curTx.destChainID] ? latestFee[curTx.srcChainID][curTx.destChainID].contractFee : 0
   return (  
     <div>
       <div className="check">
