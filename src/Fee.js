@@ -522,7 +522,7 @@ const Fee = () => {
     nav = <Navigation data = { feeSrcDest } curTx = { curTx} onMenuClick = { setCurTx } />
   }
 
-  if (data.prices && data.gasPrices && data.fees && data.txs) {
+  if (data.prices && data.gasPrices && data.fees && data.txs && latestFee) {
     console.log('fees, txs, prices, gasPrices has been set')
   
     const srcPrices = data.prices.filter(i => (i.bip44 === srcChainID)).sort((a, b)=>(a.time - b.time))
