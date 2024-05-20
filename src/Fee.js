@@ -134,7 +134,7 @@ function Navigation({ data, curTx, onMenuClick }) {
 //   return null;
 // };
 
-function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
+function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestFee }) {
   const [isTx, setIsTx] = useState(true);
   const [isTxMy, setIsTxMy] = useState(true);
   const [isContractFee, setIsContractFee] = useState(false);
@@ -205,7 +205,6 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
   let srcPricesMyYAxis = <YAxis />
   let destPricesMyYAxis = <YAxis />
   let gasPriceYAxis = <YAxis />
-  // let gasPriceMyYAxis = <YAxis />
   let incomeUsdtYAxis = <YAxis />
   let outcomeUsdtYAxis = <YAxis />
 
@@ -312,6 +311,7 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
   // }
   const lastContractFee = lastFee ? lastFee.contractFee : 0
   const lastTxFee = lastTx ? lastTx.fee : 0
+  const latestFeeReal = latestFee[curTx.srcChainID][curTx.destChainID]
   return (  
     <div>
       <div className="check">
@@ -349,6 +349,9 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee }) {
       </div>
       <div>
       合约收费最新设置: {lastContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(lastContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+      <div>
+      合约收费最新设置真: {latestFeeReal} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(latestFeeReal).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
 
       <LineChart width={2000} height={800} data={data} margin={{ top: 5, right: 30, left: 200, bottom: 5 }}>  
@@ -398,6 +401,8 @@ const Fee = () => {
   const [curTx, setCurTx] = useState({ srcChainType : 'WAN', destChainType: 'BTC', srcChainID: 2153201998, destChainID : 2147483648 })
   const [time, setTime] = useState(0)
   const [firstOldFee, setFirstOldFee] = useState(null)
+  // const [tj, setTj] = useState({});
+  const [latestFee, setLatestFee] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -468,11 +473,21 @@ const Fee = () => {
         // set nav
         console.log(JSON.stringify(tmpFeeSrcDest, null, 2))
 
-        // set data
-        // const data = merge(fees, txs, prices, gasPrices)
+        // tj
+        // const tj = await chainState.getTj()
+        // console.log(JSON.stringify(tj, null, 2))
+
+        // latestFee
+        const latestFee = await chainState.getLatestFee()
+        console.log(JSON.stringify(latestFee, null, 2))
+
+
+        /// set
         setTime(time)
         setChains(chains)
         setFeeSrcDest(tmpFeeSrcDest)
+        // setTj(tj)
+        setLatestFee(latestFee)
         setData({fees, txs, prices, gasPrices});
       } catch (error) {
         console.error('Error fetching data: ', error);
@@ -657,7 +672,16 @@ const Fee = () => {
   
     const latestSrcPrice = srcPrices[srcPrices.length - 1]
     const latestDestPrice = destPrices[destPrices.length - 1]
-    const chart = <FeeChart data ={ feeData } curTx = { curTx} lastTx = { lastTx } lastFee = { lastFee } time = {time} latest = {{srcPrice: latestSrcPrice ? latestSrcPrice.price : 'noDate', destPrice: latestDestPrice ? latestDestPrice.price : 'noDate'}}/>
+    const chart = <FeeChart 
+      data ={ feeData } 
+      curTx = { curTx} 
+      lastTx = { lastTx } 
+      lastFee = { lastFee } 
+      time = {time} 
+      latest = {{srcPrice: latestSrcPrice ? latestSrcPrice.price : 'noDate', destPrice: latestDestPrice ? latestDestPrice.price : 'noDate'}}
+      latestFee = {latestFee}
+      // tj = { tj }
+    />
   
     return (
       <div className='center-container'>

@@ -129,6 +129,28 @@ class ChainState {
     }
   }
 
+  getLatestFee = async () => {
+    try {
+      const data = (await axios.get(`${url}latestFee`)).data;
+      console.log(`get latest fee: ${JSON.stringify(data)}`)
+      return data;
+    } catch (error) {
+      console.log('request latest fee error: ' + error);
+      return null;
+    }
+  }
+
+  getTj = async () => {
+    try {
+      const data = (await axios.get(`${url}tj`)).data;
+      console.log(`get t j: ${JSON.stringify(data)}`)
+      return data;
+    } catch (error) {
+      console.log('request t j error: ' + error);
+      return null;
+    }
+  }
+
   getChainsBk = async () => {
     try {
       const data = (await axios.get(`https://tokenpairs.wanpos.xyz/api/supportedChains/mainnet`)).data;
