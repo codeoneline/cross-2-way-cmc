@@ -86,7 +86,7 @@ class ChainState {
 
   findFirstOldFee = async (srcChainID, destChainID, time) => {
     try {
-      const data2 = (await axios.get(`${url}findFirstOldFee?srcChainID=${srcChainID}&destChainID=${destChainID}&time=${time}`));
+      const data2 = await axios.get(`${url}findFirstOldFee?srcChainID=${srcChainID}&destChainID=${destChainID}&time=${time}`)
       const data = data2.data
       console.log(`find first old fee ${srcChainID} ->${destChainID} time <= ${time} : ${JSON.stringify(data)}`)
       return data;

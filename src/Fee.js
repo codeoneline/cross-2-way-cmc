@@ -580,13 +580,13 @@ const Fee = () => {
         // ltc doge wan bnb,差距较大
         if (i.destChainID === 0x80000000) { // BTC
           // times = 1.5 *  332.0 / 212.0 = 2.35
-          times = 1.8
+          times = 1.44
         } else if (i.destChainID === 0x80000002) {
         // ltc
-          times = 0.895
+          times = 1 // 0.895
         } else if (i.destChainID === 0x80000003) {
         // doge
-          times = 0.4
+          times = 1 // 0.4
         } else if (i.destChainID === 2153201998) {
         // wan 
           i.gasPriceMy = BigNumber(1000000000).toNumber()
