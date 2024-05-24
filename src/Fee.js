@@ -134,7 +134,7 @@ function Navigation({ data, curTx, onMenuClick }) {
 //   return null;
 // };
 
-function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestContractFee }) {
+function FeeChart({ data, curTx, latest, time, lastTx, lastFee, lastSetFee }) {
   const [isTx, setIsTx] = useState(true);
   const [isTxMy, setIsTxMy] = useState(true);
   const [isContractFee, setIsContractFee] = useState(false);
@@ -350,7 +350,7 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, latestContractFe
       合约收费最新设置: {lastContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(lastContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
       <div>
-      合约收费最新设置真: {latestContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(latestContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      合约设置消耗: {lastSetFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(lastSetFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
 
       <LineChart width={2000} height={800} data={data} margin={{ top: 5, right: 30, left: 200, bottom: 5 }}>  
@@ -550,6 +550,7 @@ const Fee = () => {
     let outcome = BigNumber(0)
     let cost = BigNumber(0)
     let pureIncome = BigNumber(0)
+    let lastSetCost = BigNumber(0)
     // 如果没有，得获取一下
     // TODO： getContractFeeBefore(time)
     let newContractFee = firstOldFee ? firstOldFee : {contractFee: 0}
@@ -632,6 +633,8 @@ const Fee = () => {
       // 计算tx的花费与收入
       // srcUsdt
       if (i.fee) {
+        lastSetCost = BigNumber(i.fee)
+
         outcome = outcome.plus(i.fee)
         i.outcome = outcome.toString()
         i.outcomeUsdt = outcome.multipliedBy(i.destPrice).toString()
@@ -684,6 +687,7 @@ const Fee = () => {
       time = {time} 
       latest = {{srcPrice: latestSrcPrice ? latestSrcPrice.price : 'noDate', destPrice: latestDestPrice ? latestDestPrice.price : 'noDate'}}
       latestContractFee = {latestContractFee}
+      lastSetCost = {lastSetCost.toString()}
       // tj = { tj }
     />
   
