@@ -134,7 +134,7 @@ function Navigation({ data, curTx, onMenuClick }) {
 //   return null;
 // };
 
-function FeeChart({ data, curTx, latest, time, lastTx, lastFee, lastSetFee }) {
+function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContractFee }) {
   const [isTx, setIsTx] = useState(true);
   const [isTxMy, setIsTxMy] = useState(true);
   const [isContractFee, setIsContractFee] = useState(false);
@@ -274,9 +274,9 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, lastSetFee }) {
   /// latest label
   const income = data.filter(item => "income" in item).pop();
   const outcome = data.filter(item => "outcome" in item).pop();
-  console.log(`lastTx = ${JSON.stringify(lastTx, null, 2)}`)
-  console.log(`lastFee = ${JSON.stringify(lastFee, null, 2)}`)
-  // lastTx = {
+  console.log(`latestTx = ${JSON.stringify(latestTx, null, 2)}`)
+  console.log(`latestFee = ${JSON.stringify(latestFee, null, 2)}`)
+  // latestTx = {
   //   "timestamp": 1713461470,
   //   "srcChainID": 2153201998,
   //   "destChainID": 2147483648,
@@ -294,7 +294,7 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, lastSetFee }) {
   //   "srcChainType": "WAN",
   //   "destChainType": "BTC"
   // }
-  // Fee.js:251 lastFee = {
+  // Fee.js:251 latestFee = {
   //   "time": 1713511840000,
   //   "block": 30931330,
   //   "srcChainID": 2153201998,
@@ -309,8 +309,9 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, lastSetFee }) {
   //   "hash": "0x6e650fd80644f96eff54337f52612e65de0f6ea420097468f4fb77542e5e8264",
   //   "cost": "0.0001205928"
   // }
-  const lastContractFee = lastFee ? lastFee.contractFee : 0
-  const lastTxFee = lastTx ? lastTx.fee : 0
+  const latestSetCost = latestFee && latestFee.cost ? latestFee.cost : 0
+  const latestContractFeeByFee = latestFee ? latestFee.contractFee : 0 // number
+  const latestTxFee = latestTx ? latestTx.fee : 0 // string
   return (  
     <div>
       <div className="check">
@@ -344,13 +345,16 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, lastSetFee }) {
         7天总支出: {outcome ? outcome.outcome : '0'}&nbsp;{curTx.destChainType}&nbsp;&nbsp;&nbsp;&nbsp;
       </div>
       <div>
-      交易最新实际消耗: {lastTxFee} {curTx.destChainType}&nbsp;&nbsp; {BigNumber(lastTxFee).multipliedBy(latest.destPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      交易最新实际消耗: {latestTxFee} {curTx.destChainType}&nbsp;&nbsp; {BigNumber(latestTxFee).multipliedBy(latest.destPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
       <div>
-      合约收费最新设置: {lastContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(lastContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      数据库中的最新contractFee: {latestContractFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(latestContractFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
       <div>
-      合约设置消耗: {lastSetFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(lastSetFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      合约中的contractFee: {latestContractFeeByFee} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(latestContractFeeByFee).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+      <div>
+      最新设置contractFee所需花费: {latestSetCost} {curTx.srcChainType} &nbsp;&nbsp; {BigNumber(latestSetCost).multipliedBy(latest.srcPrice).toString()} $ &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
 
       <LineChart width={2000} height={800} data={data} margin={{ top: 5, right: 30, left: 200, bottom: 5 }}>  
@@ -392,16 +396,39 @@ function FeeChart({ data, curTx, latest, time, lastTx, lastFee, lastSetFee }) {
   );  
 }
 
+const feeToItemDate = (fee, chains) => {
+  fee.srcChainID = parseInt(fee.srcChainID)
+  fee.destChainID = parseInt(fee.destChainID)
+  if (fee.contractFee) {
+    fee.contractFee = BigNumber(fee.contractFee).dividedBy(chains[fee.srcChainID].unit).toNumber()
+  }
+  if (fee.fee) {
+    fee.cost = fee.fee
+    delete fee.fee
+  }
+  
+  fee.time = fee.time * 1000
+}
+
+const txToItemDate = (tx, chains) => {
+  tx.time = tx.timestamp * 1000
+
+  const srcChainType = chains[tx.srcChainID].chainType
+  const destChainType = chains[tx.destChainID].chainType
+
+  tx.srcChainType = srcChainType
+  tx.destChainType = destChainType
+
+}
+
 const Fee = () => {
   const [data, setData] = useState([]);
   const [chains, setChains] = useState([]);
   const [feeSrcDest, setFeeSrcDest] = useState({});
-  // const [curTx, setCurTx] = useState({ srcChainType: 'ARETH', destChainType: 'BNB', srcChainID: 1073741826, destChainID : 2147484362 })
   const [curTx, setCurTx] = useState({ srcChainType : 'WAN', destChainType: 'BTC', srcChainID: 2153201998, destChainID : 2147483648 })
   const [time, setTime] = useState(0)
   const [firstOldFee, setFirstOldFee] = useState(null)
-  // const [tj, setTj] = useState({});
-  const [latestFee, setLatestFee] = useState({});
+  const [latestFees, setLatestFees] = useState({})
 
   useEffect(() => {
     const fetchData = async () => {
@@ -428,40 +455,22 @@ const Fee = () => {
         /// fee
         const fees = await chainState.getFees(time)
         fees.forEach(fee => {
-          fee.srcChainID = parseInt(fee.srcChainID)
-          fee.destChainID = parseInt(fee.destChainID)
-          if (fee.contractFee) {
-            fee.contractFee = BigNumber(fee.contractFee).dividedBy(chains[fee.srcChainID].unit).toNumber()
-          }
-          if (fee.fee) {
-            fee.cost = fee.fee
-            delete fee.fee
-          }
-          
-          fee.time = fee.time * 1000
+          feeToItemDate(fee, chains)
         })
         /// txs
         const txs = (await chainState.getTxs(time)).filter(i => (i.timestamp))
-        txs.forEach(i => {
-          i.time = i.timestamp * 1000
+        txs.forEach(tx => {
+          txToItemDate(tx, chains)
 
-          const srcChainType = chains[i.srcChainID].chainType
-          const destChainType = chains[i.destChainID].chainType
-
-          if (chains[i.srcChainID].isCrossAdmin) {
+          if (chains[tx.srcChainID].isCrossAdmin) {
             // trim navigate
-            if (!tmpFeeSrcDest[srcChainType]) {
-              tmpFeeSrcDest[srcChainType] = {}
+            if (!tmpFeeSrcDest[tx.srcChainType]) {
+              tmpFeeSrcDest[tx.srcChainType] = {}
             }
-            if (!tmpFeeSrcDest[srcChainType][destChainType]) {
-              tmpFeeSrcDest[srcChainType][destChainType] = i
+            if (!tmpFeeSrcDest[tx.srcChainType][tx.destChainType]) {
+              tmpFeeSrcDest[tx.srcChainType][tx.destChainType] = tx
             }
           }
-
-          i.srcChainType = srcChainType
-          i.destChainType = destChainType
-
-          // TODO: 插值出来我的gasPrice
         })
         /// price
         const prices = await chainState.getPrices(time)
@@ -477,16 +486,15 @@ const Fee = () => {
         // console.log(JSON.stringify(tj, null, 2))
 
         // latestFee
-        const latestFee = await chainState.getLatestFee()
-        console.log(JSON.stringify(latestFee, null, 2))
-
+        const latestFees = await chainState.getLatestFees()
+        console.log(JSON.stringify(latestFees, null, 2))
 
         /// set
         setTime(time)
         setChains(chains)
         setFeeSrcDest(tmpFeeSrcDest)
         // setTj(tj)
-        setLatestFee(latestFee)
+        setLatestFees(latestFees)
         setData({fees, txs, prices, gasPrices});
       } catch (error) {
         console.error('Error fetching data: ', error);
@@ -498,49 +506,53 @@ const Fee = () => {
 
   useEffect(() => {
     const {srcChainID, destChainID} = curTx
-    const updateOldFee = async () => {
+    const updateFirstOldFee = async () => {
       if (time !== 0 && Object.keys(chains).length > 0) {
-        const oldFee = await chainState.findFirstOldFee(srcChainID, destChainID, time)
-        if (oldFee) {
-          if (oldFee.contractFee && chains[oldFee.srcChainID] && chains[oldFee.srcChainID].unit) {
-            oldFee.contractFee = BigNumber(oldFee.contractFee).dividedBy(chains[oldFee.srcChainID].unit).toNumber()
+        const firstOldFee = await chainState.findFirstOldFee(srcChainID, destChainID, time)
+        if (firstOldFee) {
+          if (firstOldFee.contractFee && chains[firstOldFee.srcChainID] && chains[firstOldFee.srcChainID].unit) {
+            firstOldFee.contractFee = BigNumber(firstOldFee.contractFee).dividedBy(chains[firstOldFee.srcChainID].unit).toNumber()
           }
-          setFirstOldFee(oldFee)
+          firstOldFee.cost = firstOldFee.fee
+          delete firstOldFee.fee
+          setFirstOldFee(firstOldFee)
         } else {
           setFirstOldFee(null)
         }
       }
     }
-    updateOldFee();
+    updateFirstOldFee();
   }, [curTx, time, chains])
 
   const {srcChainType, destChainType, srcChainID, destChainID} = curTx
 
   let nav = <div/>
   if (feeSrcDest) {
-    nav = <Navigation data = { feeSrcDest } curTx = { curTx} onMenuClick = { setCurTx } />
+    nav = <Navigation data = { feeSrcDest } curTx = { curTx } onMenuClick = { setCurTx } />
   }
 
-  if (data.prices && data.gasPrices && data.fees && data.txs && latestFee) {
+  if (data.prices && data.gasPrices && data.fees && data.txs && latestFees) {
     console.log('fees, txs, prices, gasPrices has been set')
   
     const srcPrices = data.prices.filter(i => (i.bip44 === srcChainID)).sort((a, b)=>(a.time - b.time))
     const destPrices = data.prices.filter(i => (i.bip44 === destChainID)).sort((a, b)=>(a.time - b.time))
     const destGasPrices = data.gasPrices.filter(i => (i.bip44 === destChainID)).sort((a, b)=>(a.time - b.time))
+
     console.log(`srcChainID = ${srcChainID}, type = ${typeof srcChainID}`)
     console.log(`destChainID = ${destChainID}, type = ${typeof destChainID}`)
     console.log(`srcChainType = ${srcChainType}, type = ${typeof srcChainType}`)
     console.log(`destChainType = ${destChainType}, type = ${typeof destChainType}`)
-    console.log(`data.fees ${JSON.stringify(data.fees)}`)
+
     const fees = data.fees.filter(i => (i.srcChainID === srcChainID && i.destChainID === destChainID))
     fees.sort((a, b)=>(a.time - b.time))
-    const lastFee = fees.length > 0 ? fees[fees.length - 1] : firstOldFee
-    console.log(fees)
-    console.log(`data.txs ${JSON.stringify(data.txs)}`)
+
+    const latestFee = fees.length > 0 ? fees[fees.length - 1] : firstOldFee
+
     const txs = data.txs.filter(i => (i.srcChainID === srcChainID && i.destChainID === destChainID ))
     txs.sort((a, b)=>(a.timestamp - b.timestamp))
-    const lastTx = txs.length > 0 ? txs[txs.length - 1] : null
     console.log(txs)
+  
+    const latestTx = txs.length > 0 ? txs[txs.length - 1] : null
   
     // const feeData = merge(fees, txs, srcPrices, destPrices, destGasPrices, srcChainID, destChainID)
     const feeData = mergeTxsFees(fees, txs, srcChainID, destChainID)
@@ -550,9 +562,7 @@ const Fee = () => {
     let outcome = BigNumber(0)
     let cost = BigNumber(0)
     let pureIncome = BigNumber(0)
-    let lastSetCost = BigNumber(0)
-    // 如果没有，得获取一下
-    // TODO： getContractFeeBefore(time)
+  
     let newContractFee = firstOldFee ? firstOldFee : {contractFee: 0}
     if (!newContractFee) {
       newContractFee = fees.find(i => (i.contractFee))
@@ -633,8 +643,6 @@ const Fee = () => {
       // 计算tx的花费与收入
       // srcUsdt
       if (i.fee) {
-        lastSetCost = BigNumber(i.fee)
-
         outcome = outcome.plus(i.fee)
         i.outcome = outcome.toString()
         i.outcomeUsdt = outcome.multipliedBy(i.destPrice).toString()
@@ -676,18 +684,17 @@ const Fee = () => {
     const latestDestPrice = destPrices[destPrices.length - 1]
 
     let latestContractFee = '0'
-    if (latestFee[srcChainID] && latestFee[srcChainID][destChainID]) {
-      latestContractFee = BigNumber(latestFee[srcChainID][destChainID].contractFee).dividedBy(chains[srcChainID].unit).toString()
+    if (latestFees[srcChainID] && latestFees[srcChainID][destChainID]) {
+      latestContractFee = BigNumber(latestFees[srcChainID][destChainID].contractFee).dividedBy(chains[srcChainID].unit).toString()
     }
     const chart = <FeeChart 
       data ={ feeData } 
       curTx = { curTx} 
-      lastTx = { lastTx } 
-      lastFee = { lastFee } 
+      latestTx = { latestTx } 
+      latestFee = { latestFee } // 最新的contractFee设置交易， 由交易获得，最近7天没有将交易，则由数据库获得
+      latestContractFee = {latestContractFee} // 最新的contractFee 由合约获得
       time = {time} 
       latest = {{srcPrice: latestSrcPrice ? latestSrcPrice.price : 'noDate', destPrice: latestDestPrice ? latestDestPrice.price : 'noDate'}}
-      latestContractFee = {latestContractFee}
-      lastSetCost = {lastSetCost.toString()}
       // tj = { tj }
     />
   

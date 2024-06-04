@@ -129,7 +129,7 @@ class ChainState {
     }
   }
 
-  getLatestFee = async () => {
+  getLatestFees = async () => {
     try {
       const data = (await axios.get(`${url}latestFee`)).data;
       console.log(`get latest fee: ${JSON.stringify(data)}`)
