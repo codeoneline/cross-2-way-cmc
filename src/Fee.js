@@ -556,6 +556,12 @@ const Fee = () => {
   
     // const feeData = merge(fees, txs, srcPrices, destPrices, destGasPrices, srcChainID, destChainID)
     const feeData = mergeTxsFees(fees, txs, srcChainID, destChainID)
+    if (!feeData[0].cost) {
+      feeData[0].cost = firstOldFee ? firstOldFee.cost : 0
+    }
+    if (!feeData[0].contractFee) {
+      feeData[0].contractFee = firstOldFee ? firstOldFee.contractFee : 0
+    }
   
     // 计算这些点上的价格
     let income = BigNumber(0)
