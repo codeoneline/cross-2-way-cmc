@@ -556,11 +556,15 @@ const Fee = () => {
   
     // const feeData = merge(fees, txs, srcPrices, destPrices, destGasPrices, srcChainID, destChainID)
     const feeData = mergeTxsFees(fees, txs, srcChainID, destChainID)
-    if (!feeData[0].cost) {
-      feeData[0].cost = firstOldFee ? firstOldFee.cost : 0
-    }
-    if (!feeData[0].contractFee) {
-      feeData[0].contractFee = firstOldFee ? firstOldFee.contractFee : 0
+    if (feeData.length > 0) {
+      if (!feeData[0].cost) {
+        feeData[0].cost = firstOldFee ? firstOldFee.cost : 0
+      }
+      if (!feeData[0].contractFee) {
+        feeData[0].contractFee = firstOldFee ? firstOldFee.contractFee : 0
+      }
+    } else {
+      console.warn(`${srcChainType} -> ${destChainType}, mergeTxsFees, no feeData `)
     }
   
     // 计算这些点上的价格
@@ -652,7 +656,6 @@ const Fee = () => {
         outcome = outcome.plus(i.fee)
         i.outcome = outcome.toString()
         i.outcomeUsdt = outcome.multipliedBy(i.destPrice).toString()
-  
   
         income = income.plus(newContractFee)
         i.income = income.toString()
