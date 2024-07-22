@@ -251,19 +251,21 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
 
   let [gasPriceMin, gasPriceMax] = getMinMax(data, 'gasPrice')
   let [gasPriceMyMin, gasPriceMyMax] = getMinMax(data, 'gasPriceMy')
+  let [destGasPriceMin, destGasPriceMax] = getMinMax(data, 'destGasPrice')
   console.log(`gasPriceMin = ${gasPriceMin}, gasPriceMax = ${gasPriceMax}`)
   console.log(`gasPriceMyMin = ${gasPriceMyMin}, gasPriceMyMax = ${gasPriceMyMax}`)
-  let gpMin = Math.min(gasPriceMin, gasPriceMyMin)
-  let gpMax = Math.max(gasPriceMax, gasPriceMyMax)
+  console.log(`destGasPriceMin = ${destGasPriceMin}, destGasPriceMax = ${destGasPriceMax}`)
+  let gpMin = Math.min(gasPriceMin, gasPriceMyMin, destGasPriceMin)
+  let gpMax = Math.max(gasPriceMax, gasPriceMyMax, destGasPriceMax)
   gasPriceYAxis = <YAxis hide={!isGasPrice && !isGasPriceMy} yAxisId="gasPrice" domain={[gpMin * 0.9, gpMax * 1.1]} stroke="#a222dd" orientation="left" />
 
   let [srcGasPriceMin, srcGasPriceMax] = getMinMax(data, 'srcGasPrice')
   console.log(`srcGasPriceMin = ${srcGasPriceMin}, srcGasPriceMax = ${srcGasPriceMax}`)
   srcGasPriceYAxis = <YAxis hide={!isSrcGasPrice } yAxisId="srcGasPrice" domain={[srcGasPriceMin * 0.9, srcGasPriceMax * 1.1]} stroke="#a2a2dd" orientation="left" />
 
-  let [destGasPriceMin, destGasPriceMax] = getMinMax(data, 'destGasPrice')
-  console.log(`destGasPriceMin = ${destGasPriceMin}, destGasPriceMax = ${destGasPriceMax}`)
-  destGasPriceYAxis = <YAxis hide={!isDestGasPrice } yAxisId="destGasPrice" domain={[destGasPriceMin * 0.9, destGasPriceMax * 1.1]} stroke="#a222dd" orientation="left" />
+  // let [destGasPriceMin, destGasPriceMax] = getMinMax(data, 'destGasPrice')
+  // console.log(`destGasPriceMin = ${destGasPriceMin}, destGasPriceMax = ${destGasPriceMax}`)
+  // destGasPriceYAxis = <YAxis hide={!isDestGasPrice } yAxisId="destGasPrice" domain={[destGasPriceMin * 0.9, destGasPriceMax * 1.1]} stroke="#a222dd" orientation="left" />
 
   // gasPriceMyYAxis = <YAxis hide={!isGasPriceMy} yAxisId="gasPriceMy" domain={[gasPriceMyMin * 0.9, gasPriceMyMax * 1.1]} stroke="#dd82dd" orientation="right"/>
 
@@ -388,7 +390,7 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
         {destPricesMyYAxis}
         {gasPriceYAxis}
         {srcGasPriceYAxis}
-        {destGasPriceYAxis}
+        {/* {destGasPriceYAxis} */}
         {incomeUsdtYAxis}
         {outcomeUsdtYAxis}
 
@@ -407,7 +409,7 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
         <Line hide={!isGasPriceMy} yAxisId="gasPrice" type="monotone" dataKey="gasPriceMy" stroke="#dd82dd" connectNulls />  
 
         <Line hide={!isSrcGasPrice} yAxisId="srcGasPrice" type="monotone" dataKey="srcGasPrice" stroke="#a2a2dd" connectNulls />  
-        <Line hide={!isDestGasPrice} yAxisId="destGasPrice" type="monotone" dataKey="destGasPrice" stroke="#a222dd" connectNulls />  
+        <Line hide={!isDestGasPrice} yAxisId="gasPrice" type="monotone" dataKey="destGasPrice" stroke="#82828d" connectNulls />  
 
         <Line hide={!isCostUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "costAllUsdt" : "costAll" } stroke="#a288dd" connectNulls />  
         <Line hide={!isPureIncomeUsdt} yAxisId="usdt" type="monotone" dataKey={isUsdt ? "pureIncomeUsdt" : "pureIncome"} stroke="#dd82dd" connectNulls />  
