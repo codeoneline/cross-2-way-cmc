@@ -144,6 +144,8 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
   const [isDestPriceMy, setIsDestPriceMy] = useState(false);
   const [isGasPrice, setIsGasPrice] = useState(false);
   const [isGasPriceMy, setIsGasPriceMy] = useState(false);
+  const [isSrcGasPrice, setIsSrcGasPrice] = useState(false);
+  const [isDestGasPrice, setIsDestGasPrice] = useState(false);
 
   const [isUsdt, setIsUsdt] = useState(true);
 
@@ -179,6 +181,12 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
   const handleIsGasPriceMyChange = (event) => {  
     setIsGasPriceMy(event.target.checked);  
   };  
+  const handleIsSrcGasPriceTxChange = (event) => {  
+    setIsSrcGasPrice(event.target.checked);  
+  };
+  const handleIsDestGasPriceTxChange = (event) => {  
+    setIsDestGasPrice(event.target.checked);  
+  };
 
   const handleIsUsdt = (event) => {  
     setIsUsdt(event.target.checked);  
@@ -205,6 +213,8 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
   let srcPricesMyYAxis = <YAxis />
   let destPricesMyYAxis = <YAxis />
   let gasPriceYAxis = <YAxis />
+  let srcGasPriceYAxis = <YAxis />
+  let destGasPriceYAxis = <YAxis />
   let incomeUsdtYAxis = <YAxis />
   let outcomeUsdtYAxis = <YAxis />
 
@@ -246,6 +256,14 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
   let gpMin = Math.min(gasPriceMin, gasPriceMyMin)
   let gpMax = Math.max(gasPriceMax, gasPriceMyMax)
   gasPriceYAxis = <YAxis hide={!isGasPrice && !isGasPriceMy} yAxisId="gasPrice" domain={[gpMin * 0.9, gpMax * 1.1]} stroke="#a222dd" orientation="left" />
+
+  let [srcGasPriceMin, srcGasPriceMax] = getMinMax(data, 'srcGasPrice')
+  console.log(`srcGasPriceMin = ${srcGasPriceMin}, srcGasPriceMax = ${srcGasPriceMax}`)
+  srcGasPriceYAxis = <YAxis hide={!isSrcGasPrice } yAxisId="srcGasPrice" domain={[srcGasPriceMin * 0.9, srcGasPriceMax * 1.1]} stroke="#a2a2dd" orientation="left" />
+
+  let [destGasPriceMin, destGasPriceMax] = getMinMax(data, 'destGasPrice')
+  console.log(`destGasPriceMin = ${destGasPriceMin}, destGasPriceMax = ${destGasPriceMax}`)
+  destGasPriceYAxis = <YAxis hide={!isDestGasPrice } yAxisId="destGasPrice" domain={[destGasPriceMin * 0.9, destGasPriceMax * 1.1]} stroke="#a222dd" orientation="left" />
 
   // gasPriceMyYAxis = <YAxis hide={!isGasPriceMy} yAxisId="gasPriceMy" domain={[gasPriceMyMin * 0.9, gasPriceMyMax * 1.1]} stroke="#dd82dd" orientation="right"/>
 
@@ -327,6 +345,9 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
         <input type="checkbox" checked={isGasPrice} onChange={handleIsGasPriceTxChange}/> gasPrice&nbsp;&nbsp;
         <input type="checkbox" checked={isGasPriceMy} onChange={handleIsGasPriceMyChange}/> gasPriceMy&nbsp;&nbsp;
 
+        <input type="checkbox" checked={isSrcGasPrice} onChange={handleIsSrcGasPriceTxChange}/> srcGasPrice&nbsp;&nbsp;
+        <input type="checkbox" checked={isDestGasPrice} onChange={handleIsDestGasPriceTxChange}/> destGasPrice&nbsp;&nbsp;
+
         <input type="checkbox" checked={isUsdt} onChange={handleIsUsdt}/> usdt&nbsp;&nbsp;
 
         <input type="checkbox" checked={isCostUsdt} onChange={handleIsCostUsdtChange}/> 执行消耗&nbsp;&nbsp;
@@ -366,6 +387,8 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
         {srcPricesMyYAxis}
         {destPricesMyYAxis}
         {gasPriceYAxis}
+        {srcGasPriceYAxis}
+        {destGasPriceYAxis}
         {incomeUsdtYAxis}
         {outcomeUsdtYAxis}
 
@@ -382,6 +405,9 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
 
         <Line hide={!isGasPrice} yAxisId="gasPrice" type="monotone" dataKey="gasPrice" stroke="#a222dd" connectNulls />  
         <Line hide={!isGasPriceMy} yAxisId="gasPrice" type="monotone" dataKey="gasPriceMy" stroke="#dd82dd" connectNulls />  
+
+        <Line hide={!isSrcGasPrice} yAxisId="srcGasPrice" type="monotone" dataKey="srcGasPrice" stroke="#a2a2dd" connectNulls />  
+        <Line hide={!isDestGasPrice} yAxisId="destGasPrice" type="monotone" dataKey="destGasPrice" stroke="#a222dd" connectNulls />  
 
         <Line hide={!isCostUsdt} yAxisId="usdt" type="monotone" dataKey={ isUsdt ? "costAllUsdt" : "costAll" } stroke="#a288dd" connectNulls />  
         <Line hide={!isPureIncomeUsdt} yAxisId="usdt" type="monotone" dataKey={isUsdt ? "pureIncomeUsdt" : "pureIncome"} stroke="#dd82dd" connectNulls />  
@@ -537,6 +563,7 @@ const Fee = () => {
     const srcPrices = data.prices.filter(i => (i.bip44 === srcChainID)).sort((a, b)=>(a.time - b.time))
     const destPrices = data.prices.filter(i => (i.bip44 === destChainID)).sort((a, b)=>(a.time - b.time))
     const destGasPrices = data.gasPrices.filter(i => (i.bip44 === destChainID)).sort((a, b)=>(a.time - b.time))
+    const srcGasPrices = data.gasPrices.filter(i => (i.bip44 === srcChainID)).sort((a, b)=>(a.time - b.time))
 
     console.log(`srcChainID = ${srcChainID}, type = ${typeof srcChainID}`)
     console.log(`destChainID = ${destChainID}, type = ${typeof destChainID}`)
@@ -586,14 +613,28 @@ const Fee = () => {
     }
     feeData.forEach(i => {
       if (i.gasPrice) { 
-        const price = linearInterpolation(destGasPrices, i.time / 1000)
-        if (price) {
-          i.gasPriceMy = price.toNumber()
+        const gasPrice = linearInterpolation(destGasPrices, i.time / 1000)
+        if (gasPrice) {
+          i.gasPriceMy = gasPrice.toNumber()
         } else {
           // ada xrp dot sol
           i.gasPriceMy = BigNumber(i.gasPrice).toNumber()
         }
-      } 
+      }
+
+      if (!i.srcGasPrice) {
+        const gasPrice = linearInterpolation(srcGasPrices, i.time / 1000)
+        if (gasPrice) {
+          i.srcGasPrice = gasPrice.toNumber()
+        }
+      }
+
+      if (!i.destGasPrice) {
+        const gasPrice = linearInterpolation(destGasPrices, i.time / 1000)
+        if (gasPrice) {
+          i.destGasPrice = gasPrice.toNumber()
+        }
+      }
 
       if (i.fee) {
         i.fee = BigNumber(i.fee).toNumber()
