@@ -344,8 +344,8 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
         <input type="checkbox" checked={isSrcPriceMy} onChange={handleIsSrcPriceMyTxChange}/> srcPriceMy&nbsp;&nbsp;
         <input type="checkbox" checked={isDestPriceMy} onChange={handleIsDestPriceMyChange}/> destPriceMy&nbsp;&nbsp;
 
-        <input type="checkbox" checked={isGasPrice} onChange={handleIsGasPriceTxChange}/> gasPrice&nbsp;&nbsp;
-        <input type="checkbox" checked={isGasPriceMy} onChange={handleIsGasPriceMyChange}/> gasPriceMy&nbsp;&nbsp;
+        <input type="checkbox" checked={isGasPrice} onChange={handleIsGasPriceTxChange}/> txDestGasPrice&nbsp;&nbsp;
+        <input type="checkbox" checked={isGasPriceMy} onChange={handleIsGasPriceMyChange}/> txDestGasPriceMy&nbsp;&nbsp;
 
         <input type="checkbox" checked={isSrcGasPrice} onChange={handleIsSrcGasPriceTxChange}/> srcGasPrice&nbsp;&nbsp;
         <input type="checkbox" checked={isDestGasPrice} onChange={handleIsDestGasPriceTxChange}/> destGasPrice&nbsp;&nbsp;
