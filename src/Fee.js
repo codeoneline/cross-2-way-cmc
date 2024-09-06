@@ -440,7 +440,9 @@ const feeToItemDate = (fee, chains) => {
 
 const txToItemDate = (tx, chains) => {
   tx.time = tx.timestamp * 1000
-
+  if (!chains[tx.srcChainID]) {
+    console.log('bad')
+  }
   const srcChainType = chains[tx.srcChainID].chainType
   const destChainType = chains[tx.destChainID].chainType
 
