@@ -472,8 +472,8 @@ const Fee = () => {
 
         let chains = {}
         chainsArray.forEach((j) => { 
-          chains[j.bip44] = j
-          chains[j.bip44].unit = BigNumber(10).pow(j.chainDecimals)
+          chains[j.chainID] = j
+          chains[j.chainID].unit = BigNumber(10).pow(j.chainDecimals)
         })
         crossAdminChainsArray.forEach((j) => {
           chains[j].isCrossAdmin = true
