@@ -440,9 +440,6 @@ const feeToItemDate = (fee, chains) => {
 
 const txToItemDate = (tx, chains) => {
   tx.time = tx.timestamp * 1000
-  if (!chains[tx.srcChainID]) {
-    console.log('bad')
-  }
   const srcChainType = chains[tx.srcChainID].chainType
   const destChainType = chains[tx.destChainID].chainType
 
@@ -488,7 +485,7 @@ const Fee = () => {
           feeToItemDate(fee, chains)
         })
         /// txs
-        const txs = (await chainState.getTxs(time)).filter(i => (i.timestamp))
+        const txs = (await chainState.getTxs(time)).filter(i => (i.timestamp && chains[tx.srcChainID] && chains[tx.destChainID]))
         txs.forEach(tx => {
           txToItemDate(tx, chains)
 
