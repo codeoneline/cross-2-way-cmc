@@ -485,7 +485,7 @@ const Fee = () => {
           feeToItemDate(fee, chains)
         })
         /// txs
-        const txs = (await chainState.getTxs(time)).filter(i => (i.timestamp && chains[tx.srcChainID] && chains[tx.destChainID]))
+        const txs = (await chainState.getTxs(time)).filter(i => (i.timestamp && chains[i.srcChainID] && chains[i.destChainID]))
         txs.forEach(tx => {
           txToItemDate(tx, chains)
 
