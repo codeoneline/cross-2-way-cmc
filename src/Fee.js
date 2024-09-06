@@ -466,14 +466,14 @@ const Fee = () => {
         /// fetch [fees, txs, prices, gasPrices],注意他们只能有一个共同成员time,其余相同名称的字段得改名
         /// chains
 
-        // let chainsArray = (await chainState.getChains(time)).filter((i) => (i.chainCoingeckoID && i.chainDecimals))
-        let chainsArray = (await chainState.getChains(time)).filter((i) => (i.coingeckoId && i.decimals))
+        let chainsArray = (await chainState.getChains(time)).filter((i) => (i.chainCoingeckoID && i.chainDecimals))
+        // let chainsArray = (await chainState.getChains(time)).filter((i) => (i.coingeckoId && i.decimals))
         let crossAdminChainsArray = await chainState.getCrossAdminChains()
 
         let chains = {}
         chainsArray.forEach((j) => { 
           chains[j.bip44] = j
-          chains[j.bip44].unit = BigNumber(10).pow(j.decimals)
+          chains[j.bip44].unit = BigNumber(10).pow(j.chainDecimals)
         })
         crossAdminChainsArray.forEach((j) => {
           chains[j].isCrossAdmin = true
