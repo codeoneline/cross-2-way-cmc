@@ -140,6 +140,17 @@ class ChainState {
     }
   }
 
+  getFeeCsv = async () => {
+    try {
+      const data = (await axios.get(`${url}getFeeCsv`)).data;
+      console.log(`get fee csv: ${JSON.stringify(data)}`)
+      return data;
+    } catch (error) {
+      console.log('request fee csv error: ' + error);
+      return null;
+    }
+  }
+
   getTj = async () => {
     try {
       const data = (await axios.get(`${url}tj`)).data;

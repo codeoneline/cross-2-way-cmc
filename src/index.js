@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
 import './index.css';
 import Oracle from './Oracle';
@@ -12,9 +12,9 @@ ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Routes>  
+        <Route path="/" element={<Home/>} exact />  
         <Route path="/oracle" element={<Oracle/>} />  
         <Route path="/fee" element={<Fee/>} />  
-        <Route path="/" element={<Home/>} exact />  
       </Routes>  
     </Router>
 
