@@ -483,6 +483,19 @@ const Fee = () => {
         const fees = await chainState.getFees(time)
         fees.forEach(fee => {
           feeToItemDate(fee, chains)
+          if (chains[fee.srcChainID].isCrossAdmin) {
+            // trim navigate
+            const srcChainType = chains[fee.srcChainID].chainType
+            const destChainType = chains[fee.destChainID].chainType
+              fee.srcChainType = srcChainType
+              fee.destChainType = destChainType
+            if (!tmpFeeSrcDest[srcChainType]) {
+              tmpFeeSrcDest[srcChainType] = {}
+            }
+            if (!tmpFeeSrcDest[srcChainType][destChainType]) {
+              tmpFeeSrcDest[srcChainType][destChainType] = fee
+            }
+          }
         })
         /// txs
         const txs = (await chainState.getTxs(time)).filter(i => (i.timestamp && chains[i.srcChainID] && chains[i.destChainID]))
@@ -557,6 +570,49 @@ const Fee = () => {
   if (feeSrcDest) {
     nav = <Navigation data = { feeSrcDest } curTx = { curTx } onMenuClick = { setCurTx } />
   }
+  const generateCSV = (data) => {
+    const csvRows = [];
+    // Get the headers
+    const headers = Object.keys(data[0]);
+    csvRows.push(headers.join(','));
+
+    // Loop over the rows
+    for (const row of data) {
+      const values = headers.map(header => {
+        const escaped = ('' + row[header]).replace(/"/g, '\\"');
+        return `"${escaped}"`;
+      });
+      csvRows.push(values.join(','));
+    }
+
+    return csvRows.join('\n');
+  };
+  let isDownloading = false
+  const downloadCSV = async () => {
+    if (isDownloading) {
+      return
+    }
+    try {
+      isDownloading = true
+      const feeContent = await chainState.getFeeCsv();
+      const csvContent = generateCSV(feeContent)
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'setFees.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      
+    } finally{
+      isDownloading = false
+    }
+  };
 
   if (data.prices && data.gasPrices && data.fees && data.txs && latestFees) {
     console.log('fees, txs, prices, gasPrices has been set')
@@ -754,6 +810,9 @@ const Fee = () => {
         {nav}
         <div className='center-div'>
           {`${srcChainType} ->  ${destChainType}`}
+          <button onClick={downloadCSV} >
+            Download set fee event to CSV
+          </button>
         </div>
         {chart}
       </div>
