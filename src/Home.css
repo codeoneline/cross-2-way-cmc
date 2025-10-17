@@ -16,10 +16,10 @@
 }  
   
 .nav-links li a {  
-  text-decoration: none; /* 移除链接的下划线 */  
-  color: inherit; /* 继承父元素的文本颜色 */  
+  text-decoration: none; 
+  color: inherit; 
 
-  font-size: 2rem; /* 设置字体大小为1.2倍基准字体大小 */ 
+  font-size: 2rem; 
 }
 .nav-links li:hover {  
   background-color: rgb(97, 183, 230); 

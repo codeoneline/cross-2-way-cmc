@@ -42,6 +42,16 @@ class ChainState {
     }
   }
 
+  getDebt = async () => {
+    try {
+      const data = (await axios.get(`${url}assetdebt`)).data;
+      return data;
+    } catch (error) {
+      console.log('request asset debt error: ' + error);
+      return null;
+    }
+  }
+
   refreshTokenPairs = async () => {
     try {
       console.log("refreshing")
