@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-// const url = 'http://localhost:3200/';
-const url = 'http://192.168.1.179:3200/';
+const url = 'http://localhost:3200/';
+// const url = 'http://192.168.1.179:3200/';
 
 class ChainState {
   getChainInfo = async () => {
@@ -30,6 +30,16 @@ class ChainState {
       return data;
     } catch (error) {
       console.log('request token managers error: ' + error);
+      return null;
+    }
+  }
+
+  getDebt = async () => {
+    try {
+      const data = (await axios.get(`${url}assetdebt`)).data;
+      return data;
+    } catch (error) {
+      console.log('request asset debt error: ' + error);
       return null;
     }
   }

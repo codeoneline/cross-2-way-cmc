@@ -3,6 +3,7 @@ import './App.css';
 import Chains from './chains';
 import Oracles from './oracles';
 import TokenManagers from './tokenManagers';
+import Debts from './debts';
 
 class App extends Component {
   render() {
@@ -16,6 +17,7 @@ class App extends Component {
           <Chains />
           <Oracles />
           <TokenManagers />
+          <Debts />
         </div>
         </div>
       </>
