@@ -1,15 +1,192 @@
 import React, { useState, useEffect } from 'react';
 import chainState from './utils/chain-state'
 
+import { Card, Row, Col, Statistic, List, Typography, Table, Tag } from 'antd';
+// import { ExclamationCircleOutlined, BugOutlined, CheckCircleOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
+
+// 解析 goodMsgs 数据的函数
+const parseGoodMsgs = (goodMsgs) => {
+  return goodMsgs.map((msg, index) => {
+    try {
+      // 使用正则表达式提取数据
+      const symbolMatch = msg.match(/symbol=(\S+)/);
+      const assetMatch = msg.match(/asset=([\d.]+)/);
+      const debtMatch = msg.match(/debt=([\d.]+)/);
+      
+      return {
+        key: index,
+        symbol: symbolMatch ? symbolMatch[1] : 'N/A',
+        asset: assetMatch ? parseFloat(assetMatch[1]) : 0,
+        debt: debtMatch ? parseFloat(debtMatch[1]) : 0,
+        rawMessage: msg // 保留原始消息用于调试
+      };
+    } catch (error) {
+      console.error('解析消息失败:', msg, error);
+      return {
+        key: index,
+        symbol: '解析错误',
+        asset: 0,
+        debt: 0,
+        rawMessage: msg
+      };
+    }
+  });
+};
+
+// 计算资产状态的函数
+const getStatus = (asset, debt) => {
+  if (asset > debt) return '健康';
+  if (asset === debt) return '平衡';
+  return '风险';
+};
+
+const DataDisplayPage = ({ data }) => {
+  const { errCount, errMsgs, excpMsgs, goodMsgs } = data;
+
+  // 解析 goodMsgs 数据
+  const goodMsgsData = parseGoodMsgs(goodMsgs);
+
+  // 定义 Table 列
+  const goodMsgsColumns = [
+    {
+      title: 'Symbol',
+      dataIndex: 'symbol',
+      key: 'symbol',
+      width: 120,
+      render: (symbol) => <Tag color="blue">{symbol}</Tag>,
+    },
+    {
+      title: 'Asset',
+      dataIndex: 'asset',
+      key: 'asset',
+      width: 120,
+      render: (asset) => asset.toLocaleString(),
+      sorter: (a, b) => a.asset - b.asset,
+    },
+    {
+      title: 'Debt',
+      dataIndex: 'debt',
+      key: 'debt',
+      width: 120,
+      render: (debt) => debt.toLocaleString(),
+      sorter: (a, b) => a.debt - b.debt,
+    },
+    {
+      title: '状态',
+      key: 'status',
+      width: 100,
+      render: (_, record) => {
+        const status = getStatus(record.asset, record.debt);
+        const color = status === '健康' ? 'green' : status === '平衡' ? 'orange' : 'red';
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+    {
+      title: '净值',
+      key: 'netValue',
+      width: 120,
+      render: (_, record) => {
+        const netValue = record.asset - record.debt;
+        const color = netValue > 0 ? 'green' : netValue === 0 ? 'orange' : 'red';
+        return (
+          <span style={{ color: netValue > 0 ? '#3f8600' : netValue === 0 ? '#fa8c16' : '#cf1322' }}>
+            {netValue.toLocaleString()}
+          </span>
+        );
+      },
+      sorter: (a, b) => (a.asset - a.debt) - (b.asset - b.debt),
+    },
+  ];
+
+  return (
+    <div style={{ padding: '24px' }}>
+      <Title level={2}>系统消息统计</Title>
+      
+      {/* 统计卡片 */}
+      <Row gutter={16} style={{ marginBottom: '24px' }}>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="错误数量"
+              value={errCount}
+              valueStyle={{ color: '#cf1322' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="错误消息数量"
+              value={errMsgs.length}
+              valueStyle={{ color: '#cf1322' }}
+            />
+            <List
+              size="small"
+              dataSource={errMsgs}
+              renderItem={(item, index) => (
+                <List.Item>
+                  <span style={{ color: '#fa8c16' }}>{index + 1}.</span> {item}
+                </List.Item>
+              )}
+              locale={{emptyText: (<span style={{ color: '#18ff90' }}>无错误</span>) }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="异常消息数量"
+              value={excpMsgs.length}
+              valueStyle={{ color: '#fa8c16' }}
+            />
+            <List
+              size="small"
+              dataSource={excpMsgs}
+              renderItem={(item, index) => (
+                <List.Item>
+                  <span style={{ color: '#fa8c16' }}>{index + 1}.</span> {item}
+                </List.Item>
+              )}
+              locale={{ emptyText: (<span style={{ color: '#18ff90' }}>无异常</span>) }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="正常消息数量"
+              value={goodMsgs.length}
+              valueStyle={{ color: '#3f8600' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Table
+                columns={goodMsgsColumns}
+                dataSource={goodMsgsData}
+                pagination={false}
+                style={{ margin: '0 auto' }}
+                locale={{ emptyText: (<span style={{ color: '#18ff90' }}>无正常</span>) }}
+              />
+            </div>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+// export default DataDisplayPage;
+
 export default function DebtDisplayPage() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [data, setData] = useState({
     errCount: 0,
     errMsgs: [],
     excpMsgs: [],
     goodMsgs: []
   });
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +215,6 @@ export default function DebtDisplayPage() {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="p-6">
@@ -55,78 +231,6 @@ export default function DebtDisplayPage() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">数据概览</h1>
-      
-      {/* 错误数量统计 */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="text-sm text-gray-500 mb-2">错误数量</div>
-        <div className="flex items-center">
-          <span className={`text-3xl font-bold ${data.errCount > 0 ? 'text-red-600' : 'text-green-600'}`}>
-            {data.errCount}
-          </span>
-        </div>
-      </div>
-
-      {/* 错误消息 */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-3 text-red-600 flex items-center">
-          错误消息 ({data.errMsgs.length})
-        </h2>
-        {data.errMsgs.length > 0 ? (
-          <ul className="border border-gray-200 rounded-lg divide-y divide-gray-200">
-            {data.errMsgs.map((msg, index) => (
-              <li key={index} className="p-4 hover:bg-gray-50">
-                <span className="text-red-600">{index + 1}. {msg}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-green-700">暂无错误消息</p>
-          </div>
-        )}
-      </div>
-
-      {/* 异常消息 */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-3 text-orange-600 flex items-center">
-          异常消息 ({data.excpMsgs.length})
-        </h2>
-        {data.excpMsgs.length > 0 ? (
-          <ul className="border border-gray-200 rounded-lg divide-y divide-gray-200">
-            {data.excpMsgs.map((msg, index) => (
-              <li key={index} className="p-4 hover:bg-gray-50">
-                <span className="text-orange-600">{index + 1}. {msg}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-green-700">暂无异常消息</p>
-          </div>
-        )}
-      </div>
-
-      {/* 正常消息 */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-3 text-green-600 flex items-center">
-          正常消息 ({data.goodMsgs.length})
-        </h2>
-        {data.goodMsgs.length > 0 ? (
-          <ul className="border border-gray-200 rounded-lg divide-y divide-gray-200">
-            {data.goodMsgs.map((msg, index) => (
-              <li key={index} className="p-4 hover:bg-gray-50">
-                <span className="text-green-600">{index + 1}. {msg}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-blue-700">暂无正常消息</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    <DataDisplayPage data={data} />
+  )
 }
