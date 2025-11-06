@@ -4,36 +4,7 @@ import chainState from './utils/chain-state'
 
 const AssetDebt = ({data}) => {
   const [selectedToken, setSelectedToken] = useState(null);
-  const [detailType, setDetailType] = useState(''); // 'asset' 或 'debt'
 
-  // const data = {
-  //   "errCount": 3,
-  //   "excpMsgs": [" ADA", " LTC"],
-  //   "errMsgs": ["token symbol=DOT, asset=0, debt=1475.7766098329; "],
-  //   "goodMsgs": [
-  //     "token symbol=ETH is good, asset=444.366233998770988439, debt=444.092275770925938674; ",
-  //     "token symbol=BTC is good, asset=43.355830180176235594, debt=42.63004659; ",
-  //   ],
-  //   "assetsDetail": {
-  //     "BTC": [
-  //       "BTC, BTC, 2147483648, smg Aries_059 = bc1p42qsv4zsnv2fdrd6z9f8vgtzl7fszc2jt7gnl8r83wx5d8flnr3ss7hmhn, coin asset is 27.40301086, decimals is 8",
-  //       "BTC, BTC, 2147483648, smg Aries_060 = bc1pjm4unt2zpy3tyjvv3h7qycnulxgtfftz95mahv0a02rmqng03zzqzktlue, coin asset is 0, decimals is 8",
-  //       // ... 其他BTC资产详情
-  //     ],
-  //     "ETH": [
-  //       "ETH, ETH, 2147483708, 0x0000000000000000000000000000000000000000, coin asset is 99.052788987102174071, decimals is 18",
-  //       "ARB, ETH, 1073741826, 0x0000000000000000000000000000000000000000, coin asset is 8.25642928075948522, decimals is 18",
-  //       // ... 其他ETH资产详情
-  //     ],
-  //   },
-  //   "debtsDetail": {
-  //     "DOT": [
-  //       "WAN, DOT, 2153201998, account = 0x52f44783bdf480e88c0ed4cf341a933cacfdbcaa, mappingToken debt is 428.6149421804, decimals is 10",
-  //       "AVAX, DOT, 2147492648, account = 0xd38bfdbfe7002ca56a1e05606e75aef5c521fff9, mappingToken debt is 111.0779, decimals is 10",
-  //       // ... 其他DOT债务详情
-  //     ]
-  //   },
-  // };
 
   // 解析goodMsgs中的token信息
   const parseGoodToken = (msg) => {
@@ -45,6 +16,7 @@ const AssetDebt = ({data}) => {
       symbol: symbolMatch ? symbolMatch[1] : '',
       asset: assetMatch ? parseFloat(assetMatch[1]) : 0,
       debt: debtMatch ? parseFloat(debtMatch[1]) : 0,
+      isGood: true
     };
   };
 
@@ -58,11 +30,12 @@ const AssetDebt = ({data}) => {
       symbol: symbolMatch ? symbolMatch[1] : '',
       asset: assetMatch ? parseFloat(assetMatch[1]) : 0,
       debt: debtMatch ? parseFloat(debtMatch[1]) : 0,
+      isGood: false
     };
   };
 
   // 解析详情数据
-  const parseDetail = (detailStr) => {
+  const parseDetail = (detailStr, type) => {
     const parts = detailStr.split(', ');
     const chain = parts[0];
     const token = parts[1];
@@ -81,23 +54,40 @@ const AssetDebt = ({data}) => {
       address: addressInfo,
       amount: amountMatch ? parseFloat(amountMatch[1]) : 0,
       decimals: decimalsMatch ? parseInt(decimalsMatch[1]) : 0,
-      type: amountInfo.includes('asset') ? 'asset' : 'debt',
+      type: type,
       rawData: detailStr
     };
   };
 
-  const handleTokenClick = (token, type) => {
+  const handleTokenClick = (token) => {
     setSelectedToken(token);
-    setDetailType(type);
   };
 
   const handleBackClick = () => {
     setSelectedToken(null);
-    setDetailType('');
   };
 
   const goodTokens = data.goodMsgs.map(parseGoodToken);
   const errTokens = data.errMsgs.map(parseErrToken);
+  const allTokens = [...goodTokens, ...errTokens];
+
+  // 计算总资产和总债务
+  const calculateTotals = (tokenSymbol) => {
+    const assetDetails = data.assetsDetail[tokenSymbol] || [];
+    const debtDetails = data.debtsDetail[tokenSymbol] || [];
+    
+    const totalAsset = assetDetails.reduce((sum, detailStr) => {
+      const detail = parseDetail(detailStr, 'asset');
+      return sum + detail.amount;
+    }, 0);
+    
+    const totalDebt = debtDetails.reduce((sum, detailStr) => {
+      const detail = parseDetail(detailStr, 'debt');
+      return sum + detail.amount;
+    }, 0);
+    
+    return { totalAsset, totalDebt };
+  };
 
   return (
     <div className="asset-debt-container">
@@ -130,11 +120,12 @@ const AssetDebt = ({data}) => {
                 <div 
                   key={index} 
                   className="token-card good"
-                  onClick={() => handleTokenClick(token.symbol, 'asset')}
+                  onClick={() => handleTokenClick(token)}
                 >
                   <h3>{token.symbol}</h3>
                   <p>资产: {token.asset.toFixed(6)}</p>
                   <p>债务: {token.debt.toFixed(6)}</p>
+                  <p>差额: <span className="positive-diff">+{(token.asset - token.debt).toFixed(6)}</span></p>
                   <p className="status-good">状态: 健康</p>
                 </div>
               ))}
@@ -149,11 +140,12 @@ const AssetDebt = ({data}) => {
                 <div 
                   key={index} 
                   className="token-card error"
-                  onClick={() => handleTokenClick(token.symbol, 'debt')}
+                  onClick={() => handleTokenClick(token)}
                 >
                   <h3>{token.symbol}</h3>
                   <p>资产: {token.asset.toFixed(6)}</p>
                   <p>债务: {token.debt.toFixed(6)}</p>
+                  <p>差额: <span className="negative-diff">-{(token.debt - token.asset).toFixed(6)}</span></p>
                   <p className="status-error">状态: 风险</p>
                 </div>
               ))}
@@ -167,46 +159,119 @@ const AssetDebt = ({data}) => {
             ← 返回概览
           </button>
           
-          <h2>{selectedToken} 的{detailType === 'asset' ? '资产' : '债务'}详情</h2>
-          
-          <div className="detail-table-container">
-            <table className="detail-table">
-              <thead>
-                <tr>
-                  <th>链</th>
-                  <th>代币</th>
-                  <th>链ID</th>
-                  <th>地址</th>
-                  <th>金额</th>
-                  <th>精度</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(detailType === 'asset' 
-                  ? data.assetsDetail[selectedToken] 
-                  : data.debtsDetail[selectedToken]
-                )?.map((detailStr, index) => {
-                  const detail = parseDetail(detailStr);
-                  return (
-                    <tr key={index}>
-                      <td>{detail.chain}</td>
-                      <td>{detail.token}</td>
-                      <td>{detail.chainId}</td>
-                      <td className="address-cell">
-                        <span title={detail.address}>
-                          {detail.address.length > 20 
-                            ? `${detail.address.substring(0, 10)}...${detail.address.substring(detail.address.length - 8)}`
-                            : detail.address
-                          }
-                        </span>
-                      </td>
-                      <td>{detail.amount.toFixed(6)}</td>
-                      <td>{detail.decimals}</td>
+          <div className="token-header">
+            <h2>{selectedToken.symbol} 详情</h2>
+            <div className="token-summary">
+              <div className="summary-card asset-summary">
+                <h3>总资产</h3>
+                <p className="amount">{calculateTotals(selectedToken.symbol).totalAsset.toFixed(6)}</p>
+              </div>
+              <div className="summary-card debt-summary">
+                <h3>总债务</h3>
+                <p className="amount">{calculateTotals(selectedToken.symbol).totalDebt.toFixed(6)}</p>
+              </div>
+              <div className={`summary-card ${selectedToken.isGood ? 'good-summary' : 'error-summary'}`}>
+                <h3>净额</h3>
+                <p className={`amount ${selectedToken.isGood ? 'positive' : 'negative'}`}>
+                  {selectedToken.isGood ? '+' : '-'}
+                  {Math.abs(calculateTotals(selectedToken.symbol).totalAsset - calculateTotals(selectedToken.symbol).totalDebt).toFixed(6)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="detail-tabs">
+            {/* 资产详情 */}
+            <div className="detail-section">
+              <h3>资产详情</h3>
+              <div className="detail-table-container">
+                <table className="detail-table">
+                  <thead>
+                    <tr>
+                      <th>链</th>
+                      <th>代币</th>
+                      <th>链ID</th>
+                      <th>地址</th>
+                      <th>金额</th>
+                      <th>精度</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {data.assetsDetail[selectedToken.symbol]?.map((detailStr, index) => {
+                      const detail = parseDetail(detailStr, 'asset');
+                      return (
+                        <tr key={index}>
+                          <td>{detail.chain}</td>
+                          <td>{detail.token}</td>
+                          <td>{detail.chainId}</td>
+                          <td className="address-cell">
+                            <span title={detail.address}>
+                              {detail.address.length > 20 
+                                ? `${detail.address.substring(0, 10)}...${detail.address.substring(detail.address.length - 8)}`
+                                : detail.address
+                              }
+                            </span>
+                          </td>
+                          <td className="asset-amount">{detail.amount.toFixed(6)}</td>
+                          <td>{detail.decimals}</td>
+                        </tr>
+                      );
+                    })}
+                    {!data.assetsDetail[selectedToken.symbol] && (
+                      <tr>
+                        <td colSpan="6" className="no-data">暂无资产数据</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* 债务详情 */}
+            <div className="detail-section">
+              <h3>债务详情</h3>
+              <div className="detail-table-container">
+                <table className="detail-table">
+                  <thead>
+                    <tr>
+                      <th>链</th>
+                      <th>代币</th>
+                      <th>链ID</th>
+                      <th>地址</th>
+                      <th>金额</th>
+                      <th>精度</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.debtsDetail[selectedToken.symbol]?.map((detailStr, index) => {
+                      const detail = parseDetail(detailStr, 'debt');
+                      return (
+                        <tr key={index}>
+                          <td>{detail.chain}</td>
+                          <td>{detail.token}</td>
+                          <td>{detail.chainId}</td>
+                          <td className="address-cell">
+                            <span title={detail.address}>
+                              {detail.address.length > 20 
+                                ? `${detail.address.substring(0, 10)}...${detail.address.substring(detail.address.length - 8)}`
+                                : detail.address
+                              }
+                            </span>
+                          </td>
+                          <td className="debt-amount">{detail.amount.toFixed(6)}</td>
+                          <td>{detail.decimals}</td>
+                        </tr>
+                      );
+                    })}
+                    {!data.debtsDetail[selectedToken.symbol] && (
+                      <tr>
+                        <td colSpan="6" className="no-data">暂无债务数据</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       )}

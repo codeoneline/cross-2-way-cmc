@@ -40,7 +40,7 @@
 
 .token-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
@@ -70,11 +70,22 @@
 .token-card h3 {
   margin: 0 0 8px 0;
   color: #333;
+  font-size: 1.2em;
 }
 
 .token-card p {
   margin: 4px 0;
   color: #666;
+}
+
+.positive-diff {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.negative-diff {
+  color: #f44336;
+  font-weight: bold;
 }
 
 .status-good {
@@ -102,11 +113,95 @@
   background: #1976d2;
 }
 
-.detail-table-container {
+.token-header {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.token-header h2 {
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+.token-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.summary-card {
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.summary-card h3 {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 0.9em;
+  text-transform: uppercase;
+}
+
+.summary-card .amount {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.asset-summary {
+  background: #e8f5e8;
+  border: 1px solid #4caf50;
+}
+
+.debt-summary {
+  background: #ffebee;
+  border: 1px solid #f44336;
+}
+
+.good-summary {
+  background: #e8f5e8;
+  border: 1px solid #4caf50;
+}
+
+.error-summary {
+  background: #ffebee;
+  border: 1px solid #f44336;
+}
+
+.positive {
+  color: #4caf50;
+}
+
+.negative {
+  color: #f44336;
+}
+
+.detail-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.detail-section {
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.detail-section h3 {
+  background: #f5f5f5;
+  margin: 0;
+  padding: 16px 20px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-table-container {
+  overflow-x: auto;
 }
 
 .detail-table {
@@ -122,7 +217,7 @@
 }
 
 .detail-table th {
-  background: #f5f5f5;
+  background: #f8f9fa;
   font-weight: 600;
   color: #333;
 }
@@ -138,9 +233,30 @@
   white-space: nowrap;
 }
 
+.asset-amount {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.debt-amount {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+  font-style: italic;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .token-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .token-summary {
     grid-template-columns: 1fr;
   }
   
