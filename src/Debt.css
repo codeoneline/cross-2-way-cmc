@@ -1,0 +1,154 @@
+.asset-debt-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.error-summary {
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.error-count {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.exception-tokens {
+  margin-top: 12px;
+}
+
+.exception-token {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section h2 {
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+.token-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.token-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.token-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.token-card.good {
+  border-left: 4px solid #4caf50;
+}
+
+.token-card.error {
+  border-left: 4px solid #f44336;
+}
+
+.token-card h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.token-card p {
+  margin: 4px 0;
+  color: #666;
+}
+
+.status-good {
+  color: #4caf50 !important;
+  font-weight: bold;
+}
+
+.status-error {
+  color: #f44336 !important;
+  font-weight: bold;
+}
+
+.back-button {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.back-button:hover {
+  background: #1976d2;
+}
+
+.detail-table-container {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detail-table th,
+.detail-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.detail-table tr:hover {
+  background: #f8f9fa;
+}
+
+.address-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .token-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-table-container {
+    overflow-x: auto;
+  }
+  
+  .detail-table {
+    min-width: 600px;
+  }
+}

@@ -1,182 +1,218 @@
 import React, { useState, useEffect } from 'react';
+import './Debt.css';
 import chainState from './utils/chain-state'
 
-import { Card, Row, Col, Statistic, List, Typography, Table, Tag } from 'antd';
-// import { ExclamationCircleOutlined, BugOutlined, CheckCircleOutlined } from '@ant-design/icons';
+const AssetDebt = ({data}) => {
+  const [selectedToken, setSelectedToken] = useState(null);
+  const [detailType, setDetailType] = useState(''); // 'asset' 或 'debt'
 
-const { Title } = Typography;
+  // const data = {
+  //   "errCount": 3,
+  //   "excpMsgs": [" ADA", " LTC"],
+  //   "errMsgs": ["token symbol=DOT, asset=0, debt=1475.7766098329; "],
+  //   "goodMsgs": [
+  //     "token symbol=ETH is good, asset=444.366233998770988439, debt=444.092275770925938674; ",
+  //     "token symbol=BTC is good, asset=43.355830180176235594, debt=42.63004659; ",
+  //   ],
+  //   "assetsDetail": {
+  //     "BTC": [
+  //       "BTC, BTC, 2147483648, smg Aries_059 = bc1p42qsv4zsnv2fdrd6z9f8vgtzl7fszc2jt7gnl8r83wx5d8flnr3ss7hmhn, coin asset is 27.40301086, decimals is 8",
+  //       "BTC, BTC, 2147483648, smg Aries_060 = bc1pjm4unt2zpy3tyjvv3h7qycnulxgtfftz95mahv0a02rmqng03zzqzktlue, coin asset is 0, decimals is 8",
+  //       // ... 其他BTC资产详情
+  //     ],
+  //     "ETH": [
+  //       "ETH, ETH, 2147483708, 0x0000000000000000000000000000000000000000, coin asset is 99.052788987102174071, decimals is 18",
+  //       "ARB, ETH, 1073741826, 0x0000000000000000000000000000000000000000, coin asset is 8.25642928075948522, decimals is 18",
+  //       // ... 其他ETH资产详情
+  //     ],
+  //   },
+  //   "debtsDetail": {
+  //     "DOT": [
+  //       "WAN, DOT, 2153201998, account = 0x52f44783bdf480e88c0ed4cf341a933cacfdbcaa, mappingToken debt is 428.6149421804, decimals is 10",
+  //       "AVAX, DOT, 2147492648, account = 0xd38bfdbfe7002ca56a1e05606e75aef5c521fff9, mappingToken debt is 111.0779, decimals is 10",
+  //       // ... 其他DOT债务详情
+  //     ]
+  //   },
+  // };
 
-// 解析 goodMsgs 数据的函数
-const parseGoodMsgs = (goodMsgs) => {
-  return goodMsgs.map((msg, index) => {
-    try {
-      // 使用正则表达式提取数据
-      const symbolMatch = msg.match(/symbol=(\S+)/);
-      const assetMatch = msg.match(/asset=([\d.]+)/);
-      const debtMatch = msg.match(/debt=([\d.]+)/);
-      
-      return {
-        key: index,
-        symbol: symbolMatch ? symbolMatch[1] : 'N/A',
-        asset: assetMatch ? parseFloat(assetMatch[1]) : 0,
-        debt: debtMatch ? parseFloat(debtMatch[1]) : 0,
-        rawMessage: msg // 保留原始消息用于调试
-      };
-    } catch (error) {
-      console.error('解析消息失败:', msg, error);
-      return {
-        key: index,
-        symbol: '解析错误',
-        asset: 0,
-        debt: 0,
-        rawMessage: msg
-      };
-    }
-  });
-};
+  // 解析goodMsgs中的token信息
+  const parseGoodToken = (msg) => {
+    const symbolMatch = msg.match(/symbol=(\w+)/);
+    const assetMatch = msg.match(/asset=([\d.]+)/);
+    const debtMatch = msg.match(/debt=([\d.]+)/);
+    
+    return {
+      symbol: symbolMatch ? symbolMatch[1] : '',
+      asset: assetMatch ? parseFloat(assetMatch[1]) : 0,
+      debt: debtMatch ? parseFloat(debtMatch[1]) : 0,
+    };
+  };
 
-// 计算资产状态的函数
-const getStatus = (asset, debt) => {
-  if (asset > debt) return '健康';
-  if (asset === debt) return '平衡';
-  return '风险';
-};
+  // 解析errMsgs中的token信息
+  const parseErrToken = (msg) => {
+    const symbolMatch = msg.match(/symbol=(\w+)/);
+    const assetMatch = msg.match(/asset=([\d.]+)/);
+    const debtMatch = msg.match(/debt=([\d.]+)/);
+    
+    return {
+      symbol: symbolMatch ? symbolMatch[1] : '',
+      asset: assetMatch ? parseFloat(assetMatch[1]) : 0,
+      debt: debtMatch ? parseFloat(debtMatch[1]) : 0,
+    };
+  };
 
-const DataDisplayPage = ({ data }) => {
-  const { errCount, errMsgs, excpMsgs, goodMsgs } = data;
+  // 解析详情数据
+  const parseDetail = (detailStr) => {
+    const parts = detailStr.split(', ');
+    const chain = parts[0];
+    const token = parts[1];
+    const chainId = parts[2];
+    const addressInfo = parts[3];
+    const amountInfo = parts[4];
+    const decimalsInfo = parts[5];
+    
+    const amountMatch = amountInfo.match(/is ([\d.]+)/);
+    const decimalsMatch = decimalsInfo.match(/is (\d+)/);
+    
+    return {
+      chain,
+      token,
+      chainId,
+      address: addressInfo,
+      amount: amountMatch ? parseFloat(amountMatch[1]) : 0,
+      decimals: decimalsMatch ? parseInt(decimalsMatch[1]) : 0,
+      type: amountInfo.includes('asset') ? 'asset' : 'debt',
+      rawData: detailStr
+    };
+  };
 
-  // 解析 goodMsgs 数据
-  const goodMsgsData = parseGoodMsgs(goodMsgs);
+  const handleTokenClick = (token, type) => {
+    setSelectedToken(token);
+    setDetailType(type);
+  };
 
-  // 定义 Table 列
-  const goodMsgsColumns = [
-    {
-      title: 'Symbol',
-      dataIndex: 'symbol',
-      key: 'symbol',
-      width: 120,
-      render: (symbol) => <Tag color="blue">{symbol}</Tag>,
-    },
-    {
-      title: 'Asset',
-      dataIndex: 'asset',
-      key: 'asset',
-      width: 120,
-      render: (asset) => asset.toLocaleString(),
-      sorter: (a, b) => a.asset - b.asset,
-    },
-    {
-      title: 'Debt',
-      dataIndex: 'debt',
-      key: 'debt',
-      width: 120,
-      render: (debt) => debt.toLocaleString(),
-      sorter: (a, b) => a.debt - b.debt,
-    },
-    {
-      title: '状态',
-      key: 'status',
-      width: 100,
-      render: (_, record) => {
-        const status = getStatus(record.asset, record.debt);
-        const color = status === '健康' ? 'green' : status === '平衡' ? 'orange' : 'red';
-        return <Tag color={color}>{status}</Tag>;
-      },
-    },
-    {
-      title: '净值',
-      key: 'netValue',
-      width: 120,
-      render: (_, record) => {
-        const netValue = record.asset - record.debt;
-        const color = netValue > 0 ? 'green' : netValue === 0 ? 'orange' : 'red';
-        return (
-          <span style={{ color: netValue > 0 ? '#3f8600' : netValue === 0 ? '#fa8c16' : '#cf1322' }}>
-            {netValue.toLocaleString()}
-          </span>
-        );
-      },
-      sorter: (a, b) => (a.asset - a.debt) - (b.asset - b.debt),
-    },
-  ];
+  const handleBackClick = () => {
+    setSelectedToken(null);
+    setDetailType('');
+  };
+
+  const goodTokens = data.goodMsgs.map(parseGoodToken);
+  const errTokens = data.errMsgs.map(parseErrToken);
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Title level={2}>系统消息统计</Title>
+    <div className="asset-debt-container">
+      <h1>资产与债务概览</h1>
       
-      {/* 统计卡片 */}
-      <Row gutter={16} style={{ marginBottom: '24px' }}>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="错误数量"
-              value={errCount}
-              valueStyle={{ color: '#cf1322' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="错误消息数量"
-              value={errMsgs.length}
-              valueStyle={{ color: '#cf1322' }}
-            />
-            <List
-              size="small"
-              dataSource={errMsgs}
-              renderItem={(item, index) => (
-                <List.Item>
-                  <span style={{ color: '#fa8c16' }}>{index + 1}.</span> {item}
-                </List.Item>
-              )}
-              locale={{emptyText: (<span style={{ color: '#18ff90' }}>无错误</span>) }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="异常消息数量"
-              value={excpMsgs.length}
-              valueStyle={{ color: '#fa8c16' }}
-            />
-            <List
-              size="small"
-              dataSource={excpMsgs}
-              renderItem={(item, index) => (
-                <List.Item>
-                  <span style={{ color: '#fa8c16' }}>{index + 1}.</span> {item}
-                </List.Item>
-              )}
-              locale={{ emptyText: (<span style={{ color: '#18ff90' }}>无异常</span>) }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="正常消息数量"
-              value={goodMsgs.length}
-              valueStyle={{ color: '#3f8600' }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Table
-                columns={goodMsgsColumns}
-                dataSource={goodMsgsData}
-                pagination={false}
-                style={{ margin: '0 auto' }}
-                locale={{ emptyText: (<span style={{ color: '#18ff90' }}>无正常</span>) }}
-              />
+      {/* 错误统计 */}
+      <div className="error-summary">
+        <h2>错误统计</h2>
+        <p>总错误数: <span className="error-count">{data.errCount}</span></p>
+        {data.excpMsgs.length > 0 && (
+          <div className="exception-tokens">
+            <h3>异常Token:</h3>
+            <ul>
+              {data.excpMsgs.map((token, index) => (
+                <li key={index} className="exception-token">{token.trim()}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {!selectedToken ? (
+        /* 概览页面 */
+        <div className="overview">
+          {/* 健康资产 */}
+          <div className="section">
+            <h2>健康资产 (Asset ≥ Debt)</h2>
+            <div className="token-grid">
+              {goodTokens.map((token, index) => (
+                <div 
+                  key={index} 
+                  className="token-card good"
+                  onClick={() => handleTokenClick(token.symbol, 'asset')}
+                >
+                  <h3>{token.symbol}</h3>
+                  <p>资产: {token.asset.toFixed(6)}</p>
+                  <p>债务: {token.debt.toFixed(6)}</p>
+                  <p className="status-good">状态: 健康</p>
+                </div>
+              ))}
             </div>
-          </Card>
-        </Col>
-      </Row>
+          </div>
+
+          {/* 问题资产 */}
+          <div className="section">
+            <h2>问题资产 (Asset &lt; Debt)</h2>
+            <div className="token-grid">
+              {errTokens.map((token, index) => (
+                <div 
+                  key={index} 
+                  className="token-card error"
+                  onClick={() => handleTokenClick(token.symbol, 'debt')}
+                >
+                  <h3>{token.symbol}</h3>
+                  <p>资产: {token.asset.toFixed(6)}</p>
+                  <p>债务: {token.debt.toFixed(6)}</p>
+                  <p className="status-error">状态: 风险</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* 详情页面 */
+        <div className="detail-view">
+          <button className="back-button" onClick={handleBackClick}>
+            ← 返回概览
+          </button>
+          
+          <h2>{selectedToken} 的{detailType === 'asset' ? '资产' : '债务'}详情</h2>
+          
+          <div className="detail-table-container">
+            <table className="detail-table">
+              <thead>
+                <tr>
+                  <th>链</th>
+                  <th>代币</th>
+                  <th>链ID</th>
+                  <th>地址</th>
+                  <th>金额</th>
+                  <th>精度</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(detailType === 'asset' 
+                  ? data.assetsDetail[selectedToken] 
+                  : data.debtsDetail[selectedToken]
+                )?.map((detailStr, index) => {
+                  const detail = parseDetail(detailStr);
+                  return (
+                    <tr key={index}>
+                      <td>{detail.chain}</td>
+                      <td>{detail.token}</td>
+                      <td>{detail.chainId}</td>
+                      <td className="address-cell">
+                        <span title={detail.address}>
+                          {detail.address.length > 20 
+                            ? `${detail.address.substring(0, 10)}...${detail.address.substring(detail.address.length - 8)}`
+                            : detail.address
+                          }
+                        </span>
+                      </td>
+                      <td>{detail.amount.toFixed(6)}</td>
+                      <td>{detail.decimals}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
-// export default DataDisplayPage;
 
 export default function DebtDisplayPage() {
   const [loading, setLoading] = useState(true);
@@ -185,14 +221,15 @@ export default function DebtDisplayPage() {
     errCount: 0,
     errMsgs: [],
     excpMsgs: [],
-    goodMsgs: []
+    goodMsgs: [],
+    assetsDetail: {},
+    debtsDetail: {},
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // 调用您的 getDebt 函数
         const result = await chainState.getDebt();
         setData(result);
       } catch (err) {
@@ -230,7 +267,5 @@ export default function DebtDisplayPage() {
     );
   }
 
-  return (
-    <DataDisplayPage data={data} />
-  )
+  return <AssetDebt data={data} />;
 }
