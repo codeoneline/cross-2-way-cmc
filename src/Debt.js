@@ -40,9 +40,13 @@ const AssetDebt = ({data}) => {
     const chain = parts[0];
     const token = parts[1];
     const chainId = parts[2];
-    const addressInfo = parts[3];
-    const amountInfo = parts[4];
-    const decimalsInfo = parts[5];
+    let addressInfo = parts[3]
+    let index = 4
+    if (parts.length === 7) {
+      addressInfo = parts[index++]
+    } 
+    const amountInfo = parts[index++];
+    const decimalsInfo = parts[index];
     
     const amountMatch = amountInfo.match(/is ([\d.]+)/);
     const decimalsMatch = decimalsInfo.match(/is (\d+)/);
