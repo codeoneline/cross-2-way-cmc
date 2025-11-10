@@ -106,6 +106,7 @@ const AssetDebt = ({data}) => {
             <h3>异常Token:</h3>
             <ul>
               {data.excpMsgs.map((msg, index) => {
+                 const separatorIndex = msg.indexOf(': ');
                 const token = msg.substring(0, separatorIndex);
                 const detail = msg.substring(separatorIndex + 2); // +2 是为了跳过 ": " 这两个字符
                 return (
