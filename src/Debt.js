@@ -34,6 +34,18 @@ const AssetDebt = ({data}) => {
     };
   };
 
+  const parseExcpToken = (msg) => {
+    const separatorIndex = msg.indexOf(': ');
+   const symbol = msg.substring(0, separatorIndex);
+   const error = msg.substring(separatorIndex + 2); // +2 是为了跳过 ": " 这两个字符
+    return {
+      symbol: symbol ? symbol : '',
+      error: error ? error : '',
+      isGood: false,
+      msg: msg
+    };
+  }
+
   // 解析详情数据
   const parseDetail = (detailStr, type) => {
     const parts = detailStr.split(', ');
@@ -73,6 +85,7 @@ const AssetDebt = ({data}) => {
 
   const goodTokens = data.goodMsgs.map(parseGoodToken);
   const errTokens = data.errMsgs.map(parseErrToken);
+  const excpTokens = data.excpMsgs.map(parseExcpToken);
   const allTokens = [...goodTokens, ...errTokens];
 
   // 计算总资产和总债务
@@ -101,20 +114,17 @@ const AssetDebt = ({data}) => {
       <div className="error-summary">
         <h2>错误统计</h2>
         <p>总错误数: <span className="error-count">{data.errCount}</span></p>
-        {data.excpMsgs.length > 0 && (
+        {excpTokens.length > 0 && (
           <div className="exception-tokens">
             <h3>异常Token:</h3>
             <ul>
-              {data.excpMsgs.map((msg, index) => {
-                 const separatorIndex = msg.indexOf(': ');
-                const token = msg.substring(0, separatorIndex);
-                const detail = msg.substring(separatorIndex + 2); // +2 是为了跳过 ": " 这两个字符
+              {excpTokens.map((token, index) => {
                 return (
                   <li 
                     key={index} 
                     className="exception-token" 
                     onClick={() => handleTokenClick(token)}
-                    >{detail.trim()}</li>
+                    >{`${token.msg.trim()}`}</li>
                 )
               })}
             </ul>
@@ -186,8 +196,7 @@ const AssetDebt = ({data}) => {
               <div className={`summary-card ${selectedToken.isGood ? 'good-summary' : 'error-summary'}`}>
                 <h3>净额</h3>
                 <p className={`amount ${selectedToken.isGood ? 'positive' : 'negative'}`}>
-                  {selectedToken.isGood ? '+' : '-'}
-                  {Math.abs(calculateTotals(selectedToken.symbol).totalAsset - calculateTotals(selectedToken.symbol).totalDebt).toFixed(6)}
+                  {(calculateTotals(selectedToken.symbol).totalAsset - calculateTotals(selectedToken.symbol).totalDebt).toFixed(6)}
                 </p>
               </div>
             </div>
