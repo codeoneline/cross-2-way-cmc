@@ -105,9 +105,17 @@ const AssetDebt = ({data}) => {
           <div className="exception-tokens">
             <h3>异常Token:</h3>
             <ul>
-              {data.excpMsgs.map((token, index) => (
-                <li key={index} className="exception-token">{token.trim()}</li>
-              ))}
+              {data.excpMsgs.map((msg, index) => {
+                const token = msg.substring(0, separatorIndex);
+                const detail = msg.substring(separatorIndex + 2); // +2 是为了跳过 ": " 这两个字符
+                return (
+                  <li 
+                    key={index} 
+                    className="exception-token" 
+                    onClick={() => handleTokenClick(token)}
+                    >{detail.trim()}</li>
+                )
+              })}
             </ul>
           </div>
         )}
