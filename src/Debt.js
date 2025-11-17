@@ -57,8 +57,8 @@ const AssetDebt = ({data}) => {
     if (parts.length === 7) {
       addressInfo = parts[index++]
     } 
-    const amountInfo = parts[index++];
-    const decimalsInfo = parts[index];
+    const amountInfo = parts.length > (index +1) ? parts[index++] : 'is 0';
+    const decimalsInfo = parts.length > (index +1) ? parts[index] : 'is 0';;
     
     const amountMatch = amountInfo.match(/is ([\d.]+)/);
     const decimalsMatch = decimalsInfo.match(/is (\d+)/);
@@ -226,14 +226,15 @@ const AssetDebt = ({data}) => {
                           <td>{detail.chain}</td>
                           <td>{detail.token}</td>
                           <td>{detail.chainId}</td>
-                          <td className="address-cell">
+                          <td>{detail.address}</td>
+                          {/* <td className="address-cell">
                             <span title={detail.address}>
                               {detail.address.length > 20 
                                 ? `${detail.address.substring(0, 10)}...${detail.address.substring(detail.address.length - 8)}`
                                 : detail.address
                               }
                             </span>
-                          </td>
+                          </td> */}
                           <td className="asset-amount">{detail.amount.toFixed(6)}</td>
                           <td>{detail.decimals}</td>
                         </tr>
@@ -272,14 +273,15 @@ const AssetDebt = ({data}) => {
                           <td>{detail.chain}</td>
                           <td>{detail.token}</td>
                           <td>{detail.chainId}</td>
-                          <td className="address-cell">
+                          <td>{detail.address}</td>
+                          {/* <td className="address-cell">
                             <span title={detail.address}>
                               {detail.address.length > 20 
                                 ? `${detail.address.substring(0, 10)}...${detail.address.substring(detail.address.length - 8)}`
                                 : detail.address
                               }
                             </span>
-                          </td>
+                          </td> */}
                           <td className="debt-amount">{detail.amount.toFixed(6)}</td>
                           <td>{detail.decimals}</td>
                         </tr>
