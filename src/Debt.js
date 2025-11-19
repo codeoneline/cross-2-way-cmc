@@ -120,11 +120,11 @@ const AssetDebt = ({data}) => {
             <ul>
               {excpTokens.map((token, index) => {
                 return (
-                  <li 
+                  <ul 
                     key={index} 
                     className="exception-token" 
                     onClick={() => handleTokenClick(token)}
-                    >{`${token.msg.trim()}`}</li>
+                    >{`${token.msg.trim()}`}</ul>
                 )
               })}
             </ul>
