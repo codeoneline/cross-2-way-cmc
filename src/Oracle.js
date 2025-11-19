@@ -15,7 +15,7 @@ class Oracle extends Component {
 
   render() {
     return (
-      <>
+      <div className='body'>
         <div className='app'>
           <div className='title'>
             <a href="./fee.js">fee</a>
@@ -28,7 +28,7 @@ class Oracle extends Component {
           <TokenManagers />
         </div>
         </div>
-      </>
+      </div>
     )
   }
 }
