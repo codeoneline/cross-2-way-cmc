@@ -57,8 +57,8 @@ const AssetDebt = ({data}) => {
     if (parts.length === 7) {
       addressInfo = parts[index++]
     } 
-    const amountInfo = parts.length > (index +1) ? parts[index++] : 'is 0';
-    const decimalsInfo = parts.length > (index +1) ? parts[index] : 'is 0';;
+    const amountInfo = parts[index++];
+    const decimalsInfo = parts[index];
     
     const amountMatch = amountInfo.match(/is ([\d.]+)/);
     const decimalsMatch = decimalsInfo.match(/is (\d+)/);
