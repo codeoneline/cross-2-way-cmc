@@ -7,6 +7,7 @@ import Oracle from './Oracle';
 import Fee from './Fee';
 import Home from './Home';
 import Debt from './Debt';
+import TokenPair from './TokenPair';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
@@ -17,6 +18,7 @@ ReactDOM.render(
         <Route path="/oracle" element={<Oracle/>} />  
         <Route path="/fee" element={<Fee/>} />  
         <Route path="/debt" element={<Debt/>} />  
+        <Route path="/tokenPair" element={<TokenPair/>} />  
       </Routes>  
     </Router>
 

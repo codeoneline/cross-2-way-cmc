@@ -13,10 +13,10 @@ const Home = () => {
             <Link to="/oracle">Oracle</Link>
           </li>
           <li>
-            <Link to="/fee">Fee</Link>
+            <Link to="/debt">Debt</Link>
           </li>
           <li>
-            <Link to="/debt">Debt</Link>
+            <Link to="/tokenPair">TokenPair</Link>
           </li>
         </ul>
       </nav>
