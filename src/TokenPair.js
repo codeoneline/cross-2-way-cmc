@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './TokenPair.css';
-import tokenPairData from './data/tokenPairData.json';
 import chainState from './utils/chain-state'
 
 // TokenPair页面组件
