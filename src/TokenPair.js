@@ -9,6 +9,12 @@ const TokenPair = ({ data }) => {
   const [currentPage, setCurrentPage] = useState(1); // 当前页码
   const itemsPerPage = 10; // 每页显示数量
 
+
+  // 使用data中的chainMap获取链名称
+  const getChainName = (chainId) => {
+    return data.chainMap?.[chainId] || chainId;
+  };
+  
   // 处理链选择
   const handleChainSelect = (chain) => {
     setSelectedChain(chain);
@@ -53,11 +59,6 @@ const TokenPair = ({ data }) => {
 
   // 总页数
   const totalPages = Math.ceil(filteredTokenPairs.length / itemsPerPage);
-
-  // 使用data中的chainMap获取链名称
-  const getChainName = (chainId) => {
-    return data.chainMap?.[chainId] || chainId;
-  };
 
   return (
     <div className="token-pair-page">
