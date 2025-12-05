@@ -18,6 +18,9 @@ const Home = () => {
           <li>
             <Link to="/tokenPair">TokenPair</Link>
           </li>
+          <li>
+            <Link to="/pool">Pool</Link>
+          </li>
         </ul>
       </nav>
     </div>

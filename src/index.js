@@ -8,6 +8,7 @@ import Fee from './Fee';
 import Home from './Home';
 import Debt from './Debt';
 import TokenPair from './TokenPair';
+import Pool from './Pool';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
@@ -19,6 +20,7 @@ ReactDOM.render(
         <Route path="/fee" element={<Fee/>} />  
         <Route path="/debt" element={<Debt/>} />  
         <Route path="/tokenPair" element={<TokenPair/>} />  
+        <Route path="/pool" element={<Pool/>} />  
       </Routes>  
     </Router>
 

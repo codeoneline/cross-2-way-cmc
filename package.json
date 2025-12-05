@@ -19,7 +19,8 @@
     "socket.io-client": "^2.3.0"
   },
   "scripts": {
-    "start": "REACT_APP_PORT=3200 REACT_APP_NETWORK=mainnet react-scripts start",
+    "start": "REACT_APP_PORT=13200 REACT_APP_NETWORK=testnet react-scripts start",
+    "startProd": "REACT_APP_PORT=3200 REACT_APP_NETWORK=mainnet react-scripts start",
     "build": "react-scripts build",
     "build-prod": "REACT_APP_PORT=3200 REACT_APP_NETWORK=mainnet react-scripts build",
     "build-prod-robot": "REACT_APP_PORT=3300 REACT_APP_NETWORK=mainnet react-scripts build",
