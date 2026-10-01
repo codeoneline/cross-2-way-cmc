@@ -68,10 +68,29 @@ function CopyableAddress({ value }) {
   if (!value) return <span style={styles.emptyValue}>—</span>
 
   const handleCopy = () => {
-    navigator.clipboard?.writeText(value).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1200)
-    })
+    const text = String(value)
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 1200)
+        })
+        .catch(() => {})
+    } else {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = text
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand('copy')
+        document.body.removeChild(ta)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1200)
+      } catch (e) {
+        // ignore
+      }
+    }
   }
 
   return (
