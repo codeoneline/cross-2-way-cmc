@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { copyText } from './utils/clipboard'
 
 const API_URL = 'http://34.210.149.238:13200/chainsRaw'
 
@@ -68,29 +69,10 @@ function CopyableAddress({ value }) {
   if (!value) return <span style={styles.emptyValue}>—</span>
 
   const handleCopy = () => {
-    const text = String(value)
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard
-        .writeText(text)
-        .then(() => {
-          setCopied(true)
-          setTimeout(() => setCopied(false), 1200)
-        })
-        .catch(() => {})
-    } else {
-      try {
-        const ta = document.createElement('textarea')
-        ta.value = text
-        document.body.appendChild(ta)
-        ta.select()
-        document.execCommand('copy')
-        document.body.removeChild(ta)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 1200)
-      } catch (e) {
-        // ignore
-      }
-    }
+    copyText(value).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1200)
+    })
   }
 
   return (
