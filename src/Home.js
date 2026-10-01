@@ -10,9 +10,6 @@ const Home = () => {
       <nav>
         <ul className="nav-links">
           <li>
-            <Link to="/oracle">Oracle</Link>
-          </li>
-          <li>
             <Link to="/debt">Debt</Link>
           </li>
           <li>
@@ -20,6 +17,18 @@ const Home = () => {
           </li>
           <li>
             <Link to="/pool">Pool</Link>
+          </li>
+          <li>
+            <Link to="/price">Price</Link>
+          </li>
+          <li>
+            <Link to="/configuration">Configuration</Link>
+          </li>
+          <li>
+            <Link to="/chainsInfo">Chains Info</Link>
+          </li>
+          <li>
+            <Link to="/storemanGroups">Storeman Groups</Link>
           </li>
         </ul>
       </nav>

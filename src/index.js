@@ -9,6 +9,10 @@ import Home from './Home';
 import Debt from './Debt';
 import TokenPair from './TokenPair';
 import Pool from './Pool';
+import Price from './Prices';
+import ConfigurationPage from './Configuration';
+import ChainsInfoPage from './ChainsInfo';
+import StoremanGroupsConfigPage from './StoremanGroups';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
@@ -21,6 +25,10 @@ ReactDOM.render(
         <Route path="/debt" element={<Debt/>} />  
         <Route path="/tokenPair" element={<TokenPair/>} />  
         <Route path="/pool" element={<Pool/>} />  
+        <Route path="/price" element={<Price/>} /> 
+        <Route path="/configuration" element={<ConfigurationPage/>} /> 
+        <Route path="/chainsInfo" element={<ChainsInfoPage/>} />
+        <Route path="/storemanGroups" element={<StoremanGroupsConfigPage/>} />
       </Routes>  
     </Router>
 
