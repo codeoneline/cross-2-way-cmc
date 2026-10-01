@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-
-const API_URL = 'http://34.210.149.238:13200/configurationRaw'
+import { API } from './utils/api'
+const API_URL = API.configuration
 
 // 把 chainID 十进制/十六进制都友好展示
 function formatChainID(chainID) {

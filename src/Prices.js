@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-
-const API_URL = 'http://34.210.149.238:13200/pricesRaw'
+import { API } from './utils/api'
+const API_URL = API.prices
 
 function formatPrice(value) {
   const num = Number(value)

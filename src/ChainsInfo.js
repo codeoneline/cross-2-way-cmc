@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { copyText } from './utils/clipboard'
-
-const API_URL = 'http://34.210.149.238:13200/chainsRaw'
+import { API } from './utils/api'
+const API_URL = API.chains
 
 // 关键字段（卡片折叠时优先展示）
 const KEY_FIELDS = [

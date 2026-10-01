@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-
-const API_URL = 'http://34.210.149.238:13200/storemanConfigRaw'
+import { API } from './utils/api'
+const API_URL = API.storemanConfig
 
 // ---------- 工具函数 ----------
 
