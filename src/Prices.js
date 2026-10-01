@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 const API_URL = 'http://34.210.149.238:13200/pricesRaw'
 
