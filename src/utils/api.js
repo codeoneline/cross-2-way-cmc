@@ -1,5 +1,5 @@
 const PORT = process.env.REACT_APP_PORT || '13200'
-const BASE = `http://testnet-oracle-${PORT}.wanscan.org`
+const BASE = `https://testnet-oracle-${PORT}.wanscan.org`
 
 export const API = {
   prices: `${BASE}/pricesRaw`,

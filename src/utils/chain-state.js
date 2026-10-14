@@ -2,7 +2,7 @@ const axios = require('axios');
 
 // const url = 'http://localhost:3200/';
 // const url ='http://16.145.219.28:' + process.env.REACT_APP_PORT + '/'
-const url = `http://testnet-oracle-${process.env.REACT_APP_PORT}.wanscan.org/`
+const url = `https://testnet-oracle-${process.env.REACT_APP_PORT}.wanscan.org/`
 
 // const options = {
 //   headers:{
