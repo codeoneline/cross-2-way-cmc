@@ -1,0 +1,40 @@
+.navbar {
+  background-color: #1a237e;
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+
+.nav-links a:hover {
+  background-color: #283593;
+}
+
+/* React Router v6 的 NavLink 可以加 active 样式，如果用 Link 就省略 */
+.nav-links a.active {
+  background-color: #3949ab;
+  font-weight: 600;
+}
+
+.page-content {
+  /* 给页面留点间距，视情况调整 */
+  min-height: calc(100vh - 56px);
+}
