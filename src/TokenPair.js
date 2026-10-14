@@ -49,7 +49,7 @@ const TokenPair = ({ data }) => {
     }
 
     return pairs;
-  }, [selectedChain, searchTerm, data.gTokenPairs]);
+  }, [selectedChain, searchTerm, data.gTokenPairs, getChainName]);
 
   // 分页数据
   const paginatedTokenPairs = useMemo(() => {

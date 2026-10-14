@@ -3,12 +3,12 @@ import { API } from './utils/api'
 const API_URL = API.configuration
 
 // 把 chainID 十进制/十六进制都友好展示
-function formatChainID(chainID) {
-  const num = Number(chainID)
-  if (!isFinite(num)) return chainID
-  const hex = '0x' + num.toString(16)
-  return `${num} (${hex})`
-}
+// function formatChainID(chainID) {
+//   const num = Number(chainID)
+//   if (!isFinite(num)) return chainID
+//   const hex = '0x' + num.toString(16)
+//   return `${num} (${hex})`
+// }
 
 // 缩短地址显示：0x8331...7005
 function shortenAddress(addr) {

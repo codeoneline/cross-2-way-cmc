@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './Oracle.css';
 import Chains from './chains';
 import Oracles from './oracles';
-import chainState from './utils/chain-state'
+// import chainState from './utils/chain-state'
 
 class Oracle extends Component {
 

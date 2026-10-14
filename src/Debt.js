@@ -86,7 +86,7 @@ const AssetDebt = ({data}) => {
   const goodTokens = data.goodMsgs.map(parseGoodToken);
   const errTokens = data.errMsgs.map(parseErrToken);
   const excpTokens = data.excpMsgs.map(parseExcpToken);
-  const allTokens = [...goodTokens, ...errTokens];
+  // const allTokens = [...goodTokens, ...errTokens];
 
   // 计算总资产和总债务
   const calculateTotals = (tokenSymbol) => {

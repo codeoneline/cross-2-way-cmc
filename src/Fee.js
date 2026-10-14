@@ -214,7 +214,7 @@ function FeeChart({ data, curTx, latest, time, latestTx, latestFee, latestContra
   let destPricesMyYAxis = <YAxis />
   let gasPriceYAxis = <YAxis />
   let srcGasPriceYAxis = <YAxis />
-  let destGasPriceYAxis = <YAxis />
+  // let destGasPriceYAxis = <YAxis />
   let incomeUsdtYAxis = <YAxis />
   let outcomeUsdtYAxis = <YAxis />
 
