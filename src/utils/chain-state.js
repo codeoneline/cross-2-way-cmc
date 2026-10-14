@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // const url = 'http://localhost:3200/';
-const url ='http://34.210.149.238:' + process.env.REACT_APP_PORT + '/'
+const url ='http://16.145.219.28:' + process.env.REACT_APP_PORT + '/'
 
 // const options = {
 //   headers:{
