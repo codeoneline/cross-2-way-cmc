@@ -11,9 +11,9 @@ const TokenPair = ({ data }) => {
 
 
   // 使用data中的chainMap获取链名称
-  const getChainName = (chainId) => {
+  const getChainName = useCallback((chainId) => {
     return data.chainMap?.[chainId] || chainId;
-  };
+  }, [data.chainMap]);
   
   // 处理链选择
   const handleChainSelect = (chain) => {
